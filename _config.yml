@@ -8,6 +8,9 @@ name: Ruiz Rivera
 # Short bio or description (displayed in the header)
 description: A transformational servant leader passionate about climate action through data science. 
 
+# Dark mode toggle:
+theme_mode: [light | dark]
+
 # URL of your avatar or profile pic (you could use your GitHub profile pic)
 avatar: https://raw.githubusercontent.com/vanislekahuna/jekyll-now/master/images/Twilight-Lycanroc-Klima.png
 
