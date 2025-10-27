@@ -1,12 +1,25 @@
-
 //
 // VARIABLES
 //
 
-// Colors
+// Light mode colors (original)
+$light-bg: #fff;
+$light-text: #333;
+$light-text-secondary: #666;
+$light-border: #eee;
+$light-header: #222;
+
+// Dark mode colors
+$dark-bg: #1a1a1a;
+$dark-text: #e4e4e4;
+$dark-text-secondary: #b0b0b0;
+$dark-border: #333;
+$dark-header: #f0f0f0;
+
+// Accent colors (remain the same)
 $blue: #4183C4;
 
-// Grays
+// Grays (keep for backwards compatibility)
 $black: #000;
 $darkerGray: #222;
 $darkGray: #333;
