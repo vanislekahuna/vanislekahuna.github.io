@@ -7,17 +7,19 @@ $light-bg: #fff;
 $light-text: #333;
 $light-text-secondary: #666;
 $light-border: #eee;
-$light-header: #222;
+$light-header: #00ff2b; //Old hex code: #222
 
 // Dark mode colors
 $dark-bg: #1a1a1a;
 $dark-text: #e4e4e4;
 $dark-text-secondary: #b0b0b0;
 $dark-border: #333;
-$dark-header: #f0f0f0;
+$dark-header: #00ff2b; //Old hex code: #f0f0f0
 
 // Accent colors (remain the same)
-$blue: #4183C4;
+$blue:	#00aeff;
+$green: #00FF41;  // Add this line
+$darkgreen: #36ba01;  // Add this line
 
 // Grays (keep for backwards compatibility)
 $black: #000;
@@ -31,6 +33,7 @@ $white: #fff;
 $helvetica: Helvetica, Arial, sans-serif;
 $helveticaNeue: "Helvetica Neue", Helvetica, Arial, sans-serif;
 $georgia: Georgia, serif;
+$monospace: 'Courier New', Courier, monospace;  // Add this line
 
 // Mobile breakpoints
 @mixin mobile {

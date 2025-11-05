@@ -234,9 +234,9 @@ img {
 
 .site-name {
   margin: 0;
-  color: var(--header-color);
+  color: $green;  // Changed from var(--header-color);
   cursor: pointer;
-  font-family: $helveticaNeue;
+  font-family: $monospace; // Changed from $helveticaNeue
   font-weight: 300;
   font-size: 28px;
   letter-spacing: 1px;
@@ -244,8 +244,9 @@ img {
 
 .site-description {
   margin: -5px 0 0 0;
-  color: var(--text-secondary);
+  color: $darkgreen;  // Changed from var(--text-secondary);
   font-size: 16px;
+  font-family: $monospace; // Included. Wasn't here before.
 
   @include mobile {
     margin: 3px 0;
@@ -255,7 +256,7 @@ img {
 nav {
   float: right;
   margin-top: 23px; // @TODO: Vertically middle align
-  font-family: $helveticaNeue;
+  font-family: $monospace; // Changed from $helveticaNeue
   font-size: 18px;
 
   @include mobile {
@@ -267,7 +268,7 @@ nav {
 
   a {
     margin-left: 20px;
-    color: var(--text-color);
+    color: $green;  // Changed from var(--text-color);
     text-align: right;
     font-weight: 300;
     letter-spacing: 1px;
