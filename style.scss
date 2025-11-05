@@ -73,7 +73,7 @@ body {
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: $helveticaNeue;
+  font-family: $monospace;  // Changed from $helveticaNeue;
   color: var(--header-color);
   font-weight: bold;
 
@@ -244,9 +244,8 @@ img {
 
 .site-description {
   margin: -5px 0 0 0;
-  color: $darkgreen;  // Changed from var(--text-secondary);
+  color: var(--text-secondary);
   font-size: 16px;
-  font-family: $monospace; // Included. Wasn't here before.
 
   @include mobile {
     margin: 3px 0;
