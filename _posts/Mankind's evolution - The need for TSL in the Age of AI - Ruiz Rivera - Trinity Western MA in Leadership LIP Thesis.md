@@ -443,6 +443,8 @@ Table 4
     <figcaption> Re-adapted from “Results from the 2016 census: Is field of study a factor in the payoff of a graduate degree?” by Katherine Wall, John Zhao, Sarah-Jane Ferguson, and Carlos Rodriguez, 2018. Statistics Canada. <a href="https://www150.statcan.gc.ca/n1/pub/75-006-x/2018001/article/54978-eng.htm">https://www150.statcan.gc.ca/n1/pub/75-006-x/2018001/article/54978-eng.htm</a>. In the public domain.</figcaption>
 </figure>  
 
+<br>
+
 On the other hand, as detailed in table 4, women experience a 27.9% increase in median annual salary when completing a Master’s Degree in Business Administration (MBA) or other related studies, second only to Public Administration. As illustrated in both table 3 & 4, there’s a seemingly high market demand for MBA graduates, regardless of gender, due to the prevalence of a steep salary increase when students graduate. Manchester (2010) further supports the idea of high demand for MBA graduates by finding a positive correlation between higher turnover intention and employees who sign learning contracts for 12 months or less of service. The only strong evidence of employee loyalty after graduation are from MBA students who sign learning contracts that exceed 12 months of service (Manchester, 2010).
 
 On the other hand, as detailed in Table 4, women experience a 27.9% increase in median annual salary when completing a Master’s Degree in Business Administration (MBA) or other related studies, second only to Public Administration. As illustrated in both tables 3 & 4, there’s a seemingly high market demand for MBA graduates, regardless of gender, due to the prevalence of a steep salary increase when students graduate. Manchester (2010) further supports the idea of high demand for MBA graduates by finding a positive correlation between higher turnover intention and employees who sign learning contracts for 12 months or less of service. The only strong evidence of employee loyalty after graduation is from MBA students who sign learning contracts that exceed 12 months of service (Manchester, 2010).
@@ -521,6 +523,8 @@ Table 5. Microsoft stock price since it’s IPO
     <img src="Images/TWU_MA_Lead_Thesis/MSFT-Stock-2018.jpg" style="height: 340px; width:463px">
     <figcaption> <em>Note</em> Reprinted from the Google search result: “MSFT stock.” Retrieved from <a href="https://www.google.com/search?q=msft+stock&rlz">https://www.google.com/search?q=msft+stock&rlz</a> on 2020, February 28. In the public domain.</figcaption>
 </figure> 
+
+<br>
 
 Since taking over in 2014, Nadella’s leadership has culminated in tangible benefits for the company, one of which being the quadrupling of its market value or its return to relevance in the industry. By instilling a growth mindset, employees began seeing their work and development as a personal journey towards something more, and hopefully one that crossed paths with the company’s mission. For this reason - learning, growth, passion, transformation - these ideals became cornerstones of the company’s innovation process of empowering others to achieve more. This was Satya Nadella’s vision when he succeeded Steve Balmer as CEO of Microsoft.
 
