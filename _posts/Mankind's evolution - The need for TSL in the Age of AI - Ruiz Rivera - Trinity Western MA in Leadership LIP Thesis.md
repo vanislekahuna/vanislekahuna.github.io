@@ -1,3 +1,8 @@
+---
+layout: post
+title: Mankind’s evolution: The need for Transformational-Servant Leadership in the Age of Artificial Intelligence
+categories: [climate-ai]
+---
 
 # <center>**Mankind’s evolution: <br> The need for Transformational-Servant Leadership <br> in the Age of Artificial Intelligence**</center>
 
