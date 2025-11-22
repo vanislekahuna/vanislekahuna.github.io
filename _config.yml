@@ -3,10 +3,13 @@
 #
 
 # Name of your site (displayed in the header)
-name: Ruiz Rivera
+name: vanisle_kahuna
 
 # Short bio or description (displayed in the header)
-description: A transformational servant leader passionate about climate action through data science. 
+description: Building the BioCyberse future. 
+
+# Dark mode toggle:
+theme_mode: [light | dark]
 
 # Dark mode toggle:
 theme_mode: [light | dark]
@@ -27,7 +30,7 @@ footer-links:
   github: vanislekahuna
   instagram:
   linkedin: ruiz-rivera
-  medium: ruiz.rivera
+  medium: "@ruiz.rivera"
   rss: # just type anything here for a working RSS icon
   twitter: 
   stackoverflow: # your stackoverflow profile, e.g. "users/50476/bart-kiers"
@@ -44,7 +47,7 @@ google_analytics:
 
 # Your website URL (e.g. http://barryclark.github.io or http://www.barryclark.co)
 # Used for Sitemap.xml and your RSS feed
-url: http://vanislekahuna.github.io
+url: https://vanislekahuna.github.io
 
 # If you're hosting your site at a Project repository on GitHub pages
 # (http://yourusername.github.io/repository-name)
@@ -89,3 +92,7 @@ exclude:
   - CNAME
 
 theme: jekyll-theme-midnight
+
+navigation:
+  - name: Bayesian_Stats
+    url: https://vanislekahuna.github.io/Statistical-Rethinking-PyMC

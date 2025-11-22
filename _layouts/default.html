@@ -11,6 +11,9 @@
 
     <link rel="stylesheet" type="text/css" href="{{ site.baseurl }}/style.css" />
     <link rel="alternate" type="application/rss+xml" title="{{ site.name }} - {{ site.description }}" href="{{ site.baseurl }}/feed.xml" />
+    
+    <!-- Theme toggle script - runs before page renders to prevent flash -->
+    <script src="{{ site.baseurl }}/js/theme-toggle.js"></script>
 
     <!-- Created with Jekyll Now - http://github.com/barryclark/jekyll-now -->
   </head>
@@ -27,8 +30,10 @@
           </div>
 
           <nav>
-            <a href="{{ site.baseurl }}/">Blog</a>
             <a href="{{ site.baseurl }}/about">About</a>
+            <a href="{{ site.baseurl }}/">Blog</a>
+            <a href="https://vanislekahuna.github.io/Statistical-Rethinking-PyMC/">Bayesian_ML</a>
+            <!-- <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">🌙</button> -->
           </nav>
         </header>
       </div>
