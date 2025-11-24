@@ -1,120 +1,296 @@
-> March, 2016: If you're on an old version of Jekyll Now and run into a) build warnings or b) syntax highlighting issues caused by [Jekyll 3 and GitHub Pages updates](https://github.com/blog/2100-github-pages-now-faster-and-simpler-with-jekyll-3-0), just :sparkles:[update your _config.yml](https://github.com/barryclark/jekyll-now/pull/445/files):sparkles: and you'll be set!
+# vanislekahuna.github.io
 
-# Jekyll Now
+Personal portfolio and blog exploring the intersection of Machine Learning and Climate Action to ensure a BioCyberse future!
 
-**Jekyll** is a static site generator that's perfect for GitHub hosted blogs ([Jekyll Repository](https://github.com/jekyll/jekyll))
 
-**Jekyll Now** makes it easier to create your Jekyll blog, by eliminating a lot of the up front setup.
+## What is BioCyberse?
 
-- You don't need to touch the command line
-- You don't need to install/configure ruby, rvm/rbenv, ruby gems :relaxed:
-- You don't need to install runtime dependencies like markdown processors, Pygments, etc
-- If you're on Windows, this will make setting up Jekyll a lot easier
-- It's easy to try out, you can just delete your forked repository if you don't like it
+**BioCyberse** is a vision of the future where safe and responsible AI augments our fight against climate change. By applying Machine Learning towards domains such as wildfire management or effective energy policy, I remain optimistic that a golden age of humanity can be actualized so that future generations can prosper from the advancements today. 
 
-In a few minutes you'll be set up with a minimal, responsive blog like the one below giving you more time to spend on writing epic blog posts!
 
-![Jekyll Now Theme Screenshot](/images/jekyll-now-theme-screenshot.jpg "Jekyll Now Theme Screenshot")
+## Technology Stack
 
-## Quick Start
+- **Jekyll** - Static site generator
+- **GitHub Pages** - Hosting platform
+- **Kramdown** - Markdown processor
+- **Rouge** - Syntax highlighting
+- **SCSS** - Styling
 
-### Step 1) Fork Jekyll Now to your User Repository
+## Site Structure
+```
+vanislekahuna.github.io/
+├── _config.yml              # Site configuration
+├── _layouts/                # Page templates
+│   ├── default.html         # Base layout with navigation
+│   ├── post.html           # Blog post layout
+│   └── page.html           # Static page layout
+├── _posts/                 # Blog posts (YYYY-MM-DD-title.md)
+├── _sass/                  # SCSS partials
+├── images/                 # Image assets
+├── js/                     # JavaScript files
+├── about.md               # About page
+├── climate-ai.html        # Climate Change/AI page
+├── index.html             # Homepage (blog listing)
+└── style.scss             # Main stylesheet
+```
 
-Fork this repo, then rename the repository to yourgithubusername.github.io.
+## How to Add Content
 
-Your Jekyll blog will often be viewable immediately at <https://yourgithubusername.github.io> (if it's not, you can often force it to build by completing step 2)
+### Adding a New Blog Post
 
-![Step 1](/images/step1.gif "Step 1")
+1. **Create a new file** in the `_posts/` directory with the format:
+```
+   YYYY-MM-DD-your-post-title.md
+```
+   Example: `2024-11-21-climate-ai-trends.md`
 
-### Step 2) Customize and view your site
+2. **Add YAML front matter** at the top of the file:
+```yaml
+   ---
+   layout: post
+   title: "Your Post Title: Subtitle Goes Here"
+   categories: [climate-ai]
+   ---
+```
+   
+   **Important notes:**
+   - Always wrap titles containing colons (`:`) in quotes
+   - Use `categories: [climate-ai]` to show posts on the Climate_Change/AI page
+   - Omit categories or use different ones for general blog posts
 
-Enter your site name, description, avatar and many other options by editing the _config.yml file. You can easily turn on Google Analytics tracking, Disqus commenting and social icons here too.
+3. **Write your content** using Markdown below the front matter
 
-Making a change to _config.yml (or any file in your repository) will force GitHub Pages to rebuild your site with jekyll. Your rebuilt site will be viewable a few seconds later at <https://yourgithubusername.github.io> - if not, give it ten minutes as GitHub suggests and it'll appear soon
+4. **Commit and push** to GitHub - changes appear in 1-2 minutes
 
-> There are 3 different ways that you can make changes to your blog's files:
+### Adding Images to Posts
 
-> 1. Edit files within your new username.github.io repository in the browser at GitHub.com (shown below).
-> 2. Use a third party GitHub content editor, like [Prose by Development Seed](http://prose.io). It's optimized for use with Jekyll making markdown editing, writing drafts, and uploading images really easy.
-> 3. Clone down your repository and make updates locally, then push them to your GitHub repository.
+1. **Upload images** to the `/images/` directory (organize in subfolders as needed):
+```
+   images/
+   └── your-project-name/
+       └── your-image.jpg
+```
 
-![_config.yml](/images/config.png "_config.yml")
+2. **Reference images** in your posts:
+```html
+   <img src="{{ site.baseurl }}/images/your-project-name/your-image.jpg" alt="Description">
+```
+   
+   Or with full HTML:
+```html
+   <figure>
+       <img src="{{ site.baseurl }}/images/your-project-name/your-image.jpg" style="width:100%">
+       <figcaption>Your caption here</figcaption>
+   </figure>
+```
 
-### Step 3) Publish your first blog post
+### Embedding Jupyter Notebooks
 
-Edit `/_posts/2014-3-3-Hello-World.md` to publish your first blog post. This [Markdown Cheatsheet](http://www.jekyllnow.com/Markdown-Style-Guide/) might come in handy.
+**Option 1: Direct link to nbviewer**
+```markdown
+[View Interactive Notebook](https://nbviewer.org/github/vanislekahuna/repo-name/blob/main/notebooks/your-notebook.ipynb)
+```
 
-![First Post](/images/first-post.png "First Post")
+**Option 2: Embed using iframe**
+```html
+<iframe src="https://nbviewer.org/github/vanislekahuna/repo-name/blob/main/notebooks/your-notebook.ipynb" 
+        width="100%" 
+        height="800px" 
+        frameborder="0">
+</iframe>
+```
 
-> You can add additional posts in the browser on GitHub.com too! Just hit the + icon in `/_posts/` to create new content. Just make sure to include the [front-matter](http://jekyllrb.com/docs/frontmatter/) block at the top of each new blog post and make sure the post's filename is in this format: year-month-day-title.md
+## How to Create a New Page
 
-## Local Development
+### Creating a Category Page (like Climate_Change/AI)
 
-1. Install Jekyll and plug-ins in one fell swoop. `gem install github-pages` This mirrors the plug-ins used by GitHub Pages on your local machine including Jekyll, Sass, etc.
-2. Clone down your fork `git clone https://github.com/yourusername/yourusername.github.io.git`
-3. Serve the site and watch for markup/sass changes `jekyll serve`
-4. View your website at http://127.0.0.1:4000/
-5. Commit any changes and push everything to the master branch of your GitHub user repository. GitHub Pages will then rebuild and serve your website.
+1. **Create a new HTML file** in the root directory (e.g., `new-category.html`):
+```html
+   ---
+   layout: default
+   title: Your Category Name
+   ---
 
-## Moar!
+   <div class="posts">
+     {% for post in site.categories.your-category %}
+       <article class="post">
+         <h1><a href="{{ site.baseurl }}{{ post.url }}">{{ post.title }}</a></h1>
+         <div class="entry">
+           {{ post.excerpt }}
+         </div>
+         <a href="{{ site.baseurl }}{{ post.url }}" class="read-more">Read More</a>
+       </article>
+     {% endfor %}
+   </div>
+```
 
-I've created a more detailed walkthrough, [**Build A Blog With Jekyll And GitHub Pages**](http://www.smashingmagazine.com/2014/08/01/build-blog-jekyll-github-pages/) over at the Smashing Magazine website. Check it out if you'd like a more detailed walkthrough and some background on Jekyll. :metal:
+2. **Add to navigation** in `_layouts/default.html` (around line 33):
+```html
+   <nav>
+     <a href="{{ site.baseurl }}/about">About</a>
+     <a href="https://vanislekahuna.github.io/Statistical-Rethinking-PyMC/">Bayesian_ML</a>
+     <a href="{{ site.baseurl }}/climate-ai">Climate_Change/AI</a>
+     <a href="{{ site.baseurl }}/new-category">New Category</a>
+   </nav>
+```
 
-It covers:
+### Creating a Static Page (like About)
 
-- A more detailed walkthrough of setting up your Jekyll blog
-- Common issues that you might encounter while using Jekyll
-- Importing from Wordpress, using your own domain name, and blogging in your favorite editor
-- Theming in Jekyll, with Liquid templating examples
-- A quick look at Jekyll 2.0’s new features, including Sass/Coffeescript support and Collections
+1. **Create a markdown file** in the root directory (e.g., `contact.md`):
+```markdown
+   ---
+   layout: page
+   title: Contact
+   permalink: /contact/
+   ---
 
-## Jekyll Now Features
+   Your page content here...
+```
 
-✓ Command-line free _fork-first workflow_, using GitHub.com to create, customize and post to your blog  
-✓ Fully responsive and mobile optimized base theme (**[Theme Demo](http://jekyllnow.com)**)  
-✓ Sass/Coffeescript support using Jekyll 2.0  
-✓ Free hosting on your GitHub Pages user site  
-✓ Markdown blogging  
-✓ Syntax highlighting  
-✓ Disqus commenting  
-✓ Google Analytics integration  
-✓ SVG social icons for your footer  
-✓ 3 http requests, including your avatar  
+2. **Add to navigation** in `_layouts/default.html`
 
-✘ No installing dependencies
-✘ No need to set up local development  
-✘ No configuring plugins  
-✘ No need to spend time on theming  
-✘ More time to code other things ... wait ✓!  
+## How to Add/Reorder Navigation Tabs
 
-## Questions?
+Edit `_layouts/default.html` (lines 32-37):
+```html
+<nav>
+  <a href="{{ site.baseurl }}/about">About</a>
+  <a href="https://vanislekahuna.github.io/Statistical-Rethinking-PyMC/">Bayesian_ML</a>
+  <a href="{{ site.baseurl }}/climate-ai">Climate_Change/AI</a>
+  <!-- Add new tabs here -->
+</nav>
+```
 
-[Open an Issue](https://github.com/barryclark/jekyll-now/issues/new) and let's chat!
+**Order matters** - tabs appear left-to-right in the order listed.
 
-## Other forkable themes
+## Design Customization
 
-You can use the [Quick Start](https://github.com/barryclark/jekyll-now#quick-start) workflow with other themes that are set up to be forked too! Here are some of my favorites:
+### Changing Colors/Theme
 
-- [Hyde](https://github.com/poole/hyde) by MDO
-- [Lanyon](https://github.com/poole/lanyon) by MDO
-- [mojombo.github.io](https://github.com/mojombo/mojombo.github.io) by Tom Preston-Werner
-- [Left](https://github.com/holman/left) by Zach Holman
-- [Minimal Mistakes](https://github.com/mmistakes/minimal-mistakes) by Michael Rose
-- [Skinny Bones](https://github.com/mmistakes/skinny-bones-jekyll) by Michael Rose
+Edit `_sass/_variables.scss` to modify:
+- Light mode colors: `$light-bg`, `$light-text`, etc.
+- Dark mode colors: `$dark-bg`, `$dark-text`, etc.
+- Accent colors: `$blue`, `$green`, `$darkgreen`
 
-## Credits
+### Changing Fonts
 
-- [Jekyll](https://github.com/jekyll/jekyll) - Thanks to its creators, contributors and maintainers.
-- [SVG icons](https://github.com/neilorangepeel/Free-Social-Icons) - Thanks, Neil Orange Peel. They're beautiful.
-- [Solarized Light Pygments](https://gist.github.com/edwardhotchkiss/2005058) - Thanks, Edward.
-- [Joel Glovier](http://joelglovier.com/writing/) - Great Jekyll articles. I used Joel's feed.xml in this repository.
-- [David Furnes](https://github.com/dfurnes), [Jon Uy](https://github.com/jonuy), [Luke Patton](https://github.com/lkpttn) - Thanks for the design/code reviews.
-- [Bart Kiers](https://github.com/bkiers), [Florian Simon](https://github.com/vermluh), [Henry Stanley](https://github.com/henryaj), [Hun Jae Lee](https://github.com/hunjaelee), [Javier Cejudo](https://github.com/javiercejudo), [Peter Etelej](https://github.com/etelej), [Ben Abbott](https://github.com/jaminscript), [Ray Nicholus](https://github.com/rnicholus), [Erin Grand](https://github.com/eringrand), [Léo Colombaro](https://github.com/LeoColomb), [Dean Attali](https://github.com/daattali), [Clayton Errington](https://github.com/cjerrington), [Colton Fitzgerald](https://github.com/coltonfitzgerald), [Trace Mayer](https://github.com/sunnankar) - Thanks for your [fantastic contributions](https://github.com/barryclark/jekyll-now/commits/master) to the project!
+Edit `_sass/_variables.scss`:
+```scss
+$helvetica: Helvetica, Arial, sans-serif;
+$monospace: 'Courier New', Courier, monospace;
+```
+
+Then update `style.scss` to apply fonts to different elements.
+
+### Adding Custom CSS
+
+Add custom styles to `style.scss` after the imports:
+```scss
+// Your custom CSS here
+.your-custom-class {
+  property: value;
+}
+```
+
+### Centering Post Titles
+
+In `style.scss`, add to the `.post` section (around line 280):
+```scss
+.post {
+  > h1 {
+    text-align: center;
+  }
+  // ... rest of styles
+}
+```
+
+## Site Configuration
+
+Edit `_config.yml` to update:
+- Site name and description
+- Social media links (footer icons)
+- Avatar image
+- Base URL
+- Navigation links
+
+Example:
+```yaml
+name: vanisle_kahuna
+description: Building the BioCyberse future.
+avatar: https://raw.githubusercontent.com/vanislekahuna/jekyll-now/master/images/your-avatar.png
+```
+
+## Troubleshooting
+
+### Post Not Appearing
+
+**Issue**: New post doesn't show up on the site
+
+**Solutions**:
+- ✅ Check filename format: `YYYY-MM-DD-title.md`
+- ✅ Ensure YAML front matter is valid (no unquoted colons in title)
+- ✅ For category pages, verify the `categories:` field matches
+- ✅ Wait 1-2 minutes for GitHub Pages to rebuild
+- ✅ Hard refresh browser (Ctrl+Shift+F5 or Cmd+Shift+R)
+
+### Images Not Loading
+
+**Issue**: Images appear blank or broken
+
+**Solutions**:
+- ✅ Move images to `/images/` directory (not `/_posts/`)
+- ✅ Use correct path: `{{ site.baseurl }}/images/your-image.jpg`
+- ✅ Check image file actually exists in repository
+- ✅ Verify image filename matches exactly (case-sensitive)
+
+### YAML Parsing Errors
+
+**Issue**: "Error in user YAML" or page won't render
+
+**Solutions**:
+- ✅ Wrap titles containing colons in quotes: `title: "Title: Subtitle"`
+- ✅ Check for proper indentation (use spaces, not tabs)
+- ✅ Ensure all YAML values are valid
+- ✅ Use [YAML validator](https://www.yamllint.com/) to check syntax
+
+### CSS Changes Not Appearing
+
+**Issue**: Style changes don't show up
+
+**Solutions**:
+- ✅ Clear browser cache / hard refresh
+- ✅ Check for SCSS syntax errors
+- ✅ Verify selectors are specific enough
+- ✅ Wait for GitHub Pages rebuild (1-2 minutes)
+
+### Category Page Empty
+
+**Issue**: Category page shows no posts
+
+**Solutions**:
+- ✅ Verify posts have correct category in front matter
+- ✅ Check category name matches exactly (case-sensitive)
+- ✅ Ensure category page queries the right category:
+```
+  {% for post in site.categories.climate-ai %}
+```
 
 ## Contributing
 
-Issues and Pull Requests are greatly appreciated. If you've never contributed to an open source project before I'm more than happy to walk you through how to create a pull request.
+This is primarily a personal portfolio, but suggestions and corrections are welcome:
 
-You can start by [opening an issue](https://github.com/barryclark/jekyll-now/issues/new) describing the problem that you're looking to resolve and we'll go from there.
+1. **Fork** the repository
+2. **Create a branch** for your changes
+3. **Make your edits** following the guidelines above
+4. **Submit a pull request** with a clear description of changes
 
-I want to keep Jekyll Now as minimal as possible. Every line of code should be one that's useful to 90% of the people using it. Please bear that in mind when submitting feature requests. If it's not something that most people will use, it probably won't get merged. :guardsman:
+For major changes, please open an issue first to discuss proposed modifications.
+
+## License
+
+This project uses the [Jekyll Now](https://github.com/barryclark/jekyll-now) template. Content is © Ruiz Rivera. Feel free to reference or learn from the code structure, but please don't reproduce the content without permission.
+
+---
+
+**Live Site**: [https://vanislekahuna.github.io](https://vanislekahuna.github.io)  
+**Statistical Rethinking Project**: [https://vanislekahuna.github.io/Statistical-Rethinking-PyMC/](https://vanislekahuna.github.io/Statistical-Rethinking-PyMC/)

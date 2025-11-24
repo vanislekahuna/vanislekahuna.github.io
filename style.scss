@@ -294,6 +294,10 @@ nav {
 }
 
 .post {
+  h1 {
+    text-align: center;
+  }
+
   blockquote {
     margin: 1.8em .8em;
     border-left: 2px solid var(--text-secondary);
@@ -311,6 +315,10 @@ nav {
     text-transform: uppercase;
     font-size: 15px;
   }
+}
+
+.centered-title h1 {
+  text-align: center;
 }
 
 .wrapper-footer {
