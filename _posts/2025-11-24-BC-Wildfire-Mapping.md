@@ -13,8 +13,6 @@ This notebook provides a step-by-step guide on wildfire mapping techniques using
 
 <!-- more -->
 
-<!-- [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/vanislekahuna/wps-labs/blob/main/Intro_Wildfire_Mapping_Lab/BC_Wildfire_Mapping.ipynb) -->
-
 <iframe 
   src="https://nbviewer.org/github/vanislekahuna/wps-labs/blob/main/Intro_Wildfire_Mapping_Lab/BC_Wildfire_Mapping.ipynb" 
   width="100%" 
@@ -26,4 +24,8 @@ This notebook provides a step-by-step guide on wildfire mapping techniques using
 
 ---
 
-*Note: This notebook is maintained in the [wps-labs repository](https://github.com/vanislekahuna/wps-labs). Click the Colab badge above to run it interactively.*
+*Note: This notebook is maintained in the [`wps-labs` repository](https://github.com/vanislekahuna/wps-labs).*
+
+Click the Colab badge below to run the notebook interactively:
+
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/vanislekahuna/wps-labs/blob/main/Intro_Wildfire_Mapping_Lab/BC_Wildfire_Mapping.ipynb)
