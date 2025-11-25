@@ -5,7 +5,7 @@ Personal portfolio and blog exploring the intersection of Machine Learning and C
 
 ## What is BioCyberse?
 
-**BioCyberse** is a vision of the future where safe and responsible AI augments our fight against climate change. By applying Machine Learning towards domains such as wildfire management or effective energy policy, I remain optimistic that a golden age of humanity can be actualized so that future generations can prosper from the advancements today. 
+**BioCyberse** is a vision of the future where safe and responsible AI augments our fight against climate change. By applying Machine Learning towards domains such as Wildfire Management or effective Energy Policy, I remain optimistic that a golden age of humanity can be actualized so that future generations can prosper from the advancements today. 
 
 
 ## Technology Stack
