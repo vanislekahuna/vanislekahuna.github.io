@@ -4,7 +4,7 @@ title: "Playing With Fire and Priors: Learning the Limits of Bayesian Linear Reg
 categories: [climate-ai]
 ---
 
-This notebook demonstrates the complete workflow for building a Bayesian Simple Linear Regression model using `PyMC` to predict wildfire size from wind speed data. We formalize the model using statistical notation, implement prior predictive simulations to validate assumptions, and generate posterior distributions through Markov Chain Monte Carlo (MCMC) sampling. The analysis reveals that wind speed alone is a weak (really terrible) predictor of fire size but provides valuable lessons about model diagnostics including what happens when we violate assumptions of linearity and heteroscedasticity in real-world data.
+This notebook demonstrates the complete workflow for building a Bayesian Simple Linear Regression model using `PyMC` to predict wildfire sizes solely from wind speed data. In it we formalize the model using statistical notation, implement prior predictive simulations to validate our assumptions, and then generate posterior distributions through Markov Chain Monte Carlo (MCMC) sampling. Unfortunately, the analysis revealed that wind speed alone is a weak (quite honestly, a terrible) predictor of fire size. Nonetheless, the value-add in our work was that it provided practical insights about the importance of model diagnostics and the pitfalls of violating assumptions of linearity and heteroscedasticity when working with real-world data!
 
 **Topics covered:**
 - Statistical model notation for Bayesian Linear Regression (priors, likelihood, parameters)
