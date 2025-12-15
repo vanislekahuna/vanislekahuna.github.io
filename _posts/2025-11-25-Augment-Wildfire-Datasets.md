@@ -13,8 +13,6 @@ This notebook demonstrates how to augment wildfire datasets with historical weat
 - Converting wind components to speed and cardinal directions
 - Handling multiple data formats (CSV, Excel, JSON, SQLite)
 
-**Key libraries:** earthengine-api, geemap, pandas, python-dotenv
-
 <!-- more -->
 
 
