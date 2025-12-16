@@ -1,7 +1,4 @@
-import json
-import warnings
 import requests
-import urllib.request
 import numpy as np
 import pandas as pd
 import geopandas as gpd
@@ -20,14 +17,19 @@ from utils import *
 
 # Initialize data
 poly_geodf = bc_alerts_api()
-sites_df = generate_fake_sites_data()
+sites_df = retrieve_site_data()
 sites_with_events = check_sites_in_emergencies(sites_df, poly_geodf)
 
 # Color mapping for event types
+EVENT_LINE_COLORS = {
+    'Fire': 'rgba(255, 80, 80, 0.4)',
+    'Flood': 'rgba(80, 150, 255, 0.4)',
+    'Landslide': 'rgba(200, 120, 60, 0.4)',
+}
+
 EVENT_COLORS = {
-    'Fire': 'rgba(255, 0, 0, 0.3)',
-    'Flood': 'rgba(0, 100, 255, 0.3)',
-    'Landslide': 'rgba(139, 69, 19, 0.3)',
+    'Alert': 'rgb(246, 200, 176)',
+    'Order': 'rgb(251, 159, 157)',
 }
 
 # Initialize Dash app
@@ -262,7 +264,7 @@ def update_map_and_table(city_filter, event_type_filter, event_name_filter,
                       lat=list(lats),
                       mode='lines',
                       fill='toself',
-                      fillcolor=EVENT_COLORS.get(row['event_type'], 'rgba(128, 128, 128, 0.3)'),
+                      fillcolor=EVENT_COLORS.get(row['order_alert_status'], 'rgba(128, 128, 128, 0.3)'),
                       line=dict(
                           color=EVENT_LINE_COLORS.get(row['event_type'], 'gray'),
                           width=3

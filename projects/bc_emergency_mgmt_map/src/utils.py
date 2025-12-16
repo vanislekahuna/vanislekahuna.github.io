@@ -180,6 +180,6 @@ def check_sites_in_emergencies(sites_df, poly_geodf):
         predicate='within'
     )
 
-    sites_in_emergency = sites_in_emergency.drop(columns=['geometry', 'index_right'], errors='ignore'])
+    sites_in_emergency = sites_in_emergency.drop(columns=['geometry', 'index_right'], errors='ignore')
 
     return sites_in_emergency
