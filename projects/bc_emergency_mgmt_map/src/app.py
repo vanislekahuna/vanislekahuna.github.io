@@ -6,7 +6,7 @@ import plotly.graph_objects as go
 
 from dash import Dash, dcc, html, Input, Output, State, dash_table
 from datetime import datetime, timedelta
-from shapely.geometry import shape, Point, Polygon, ShapelyPolygon
+from shapely.geometry import shape, Point, Polygon
 from zoneinfo import ZoneInfo
 from utils import *
 

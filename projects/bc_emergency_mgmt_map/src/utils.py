@@ -1,7 +1,4 @@
-# import json
-# import warnings
 import requests
-# import urllib.request
 import numpy as np
 import pandas as pd
 import geopandas as gpd
@@ -9,7 +6,7 @@ import geopandas as gpd
 
 # from dash import Dash, dcc, html, Input, Output, State, dash_table
 # from datetime import datetime, timedelta
-from shapely.geometry import shape, Point, Polygon, ShapelyPolygon
+from shapely.geometry import shape, Point, Polygon
 # from zoneinfo import ZoneInfo
 
 
@@ -77,7 +74,7 @@ def bc_alerts_api():
 
                 # Create a separate entry for each coordinate ring
                 for part_num, ring_coords in enumerate(coords, start=1):
-                    polygon_geom = ShapelyPolygon(ring_coords)
+                    polygon_geom = Polygon(ring_coords)
 
                     event_data.append({
                         'event_id': feature.get('id'),
