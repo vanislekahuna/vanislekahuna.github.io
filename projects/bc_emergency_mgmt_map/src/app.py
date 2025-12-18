@@ -153,7 +153,10 @@ app.layout = html.Div([
 def refresh_emergency_data(n_clicks):
     """Refresh emergency data from API"""
     # In real implementation, fetch from API here
+    print("Fetching emergency data from function...")
     poly_geodf_new = bc_alerts_api()
+
+    print("Fetching site data from function...")
     sites_with_events_new = check_sites_in_emergencies(sites_df, poly_geodf_new)
 
     # Store as JSON
