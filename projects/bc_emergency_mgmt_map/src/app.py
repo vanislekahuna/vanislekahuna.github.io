@@ -16,9 +16,21 @@ from utils import *
 # ============================================================================
 
 # Initialize data
+# poly_geodf = bc_alerts_api()
+# sites_df = retrieve_site_data()
+# sites_with_events = check_sites_in_emergencies(sites_df, poly_geodf)
+
+print("Fetching emergency data...")
 poly_geodf = bc_alerts_api()
+print(f"✓ Got {len(poly_geodf)} emergency events")
+
+print("Fetching sites data...")
 sites_df = retrieve_site_data()
+print(f"✓ Got {len(sites_df)} sites")
+
+print("Checking affected sites...")
 sites_with_events = check_sites_in_emergencies(sites_df, poly_geodf)
+print("✓ Initialization complete")
 
 # Color mapping for event types
 EVENT_LINE_COLORS = {
@@ -351,7 +363,7 @@ def update_map_and_table(city_filter, event_type_filter, event_name_filter,
 
     # Configure scroll zoom behavior
     fig.update_mapboxes(bearing=0, pitch=0)
-    fig.show(config={'scrollZoom': True, 'displayModeBar': True})
+    # fig.show(config={'scrollZoom': True, 'displayModeBar': True})
 
     # Prepare table data
     table_data = filtered_sites[['site_name', 'city', 'phone', 'max_capacity', 'event_type']].fillna('').to_dict('records')
@@ -361,4 +373,4 @@ def update_map_and_table(city_filter, event_type_filter, event_name_filter,
 if __name__ == '__main__':
     # For Google Colab, use mode='inline' or 'external'
     # For local Jupyter, use mode='inline' or mode='jupyterlab'
-    app.run(port=8050, debug=True)
+    app.run(port=8050, debug=False, use_reloader=False)
