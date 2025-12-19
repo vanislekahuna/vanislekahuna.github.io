@@ -16,11 +16,7 @@ from utils import *
 # DASH APP
 # ============================================================================
 
-# Initialize data
-# poly_geodf = bc_alerts_api()
-# sites_df = retrieve_site_data()
-# sites_with_events = check_sites_in_emergencies(sites_df, poly_geodf)
-
+# Initializing data with some diagnostics...
 print("Fetching emergency data...")
 poly_geodf = bc_alerts_api()
 print(f"✓ Got {len(poly_geodf)} emergency events")
@@ -90,11 +86,26 @@ app.index_string = '''
             }
             
             /* Dropdown styling */
+            /* Dropdown text color fix */
+            .custom-dropdown .Select-control,
+            .custom-dropdown .Select-value-label,
+            .custom-dropdown .Select-placeholder {
+                color: #e4e4e4 !important;
+            }
+
             .Select-control {
                 background-color: #1a1a1a !important;
                 border-color: #333 !important;
             }
+
+            .Select-value-label {
+                color: #e4e4e4 !important;
+            }
             
+            .Select-placeholder {
+                color: #b0b0b0 !important;
+            }
+
             .Select-menu-outer {
                 background-color: #1a1a1a !important;
                 border-color: #333 !important;
@@ -212,8 +223,10 @@ app.layout = html.Div([
                 clearable=False,
                 style={
                     'width': '200px',
-                    'fontFamily': FONT_FAMILY_REGULAR
-                }
+                    'fontFamily': FONT_FAMILY_REGULAR,
+                    'color': COLORS['dark_text']
+                },
+                className='custom-dropdown'
             )
         ], style={'display': 'inline-block', 'margin-right': '20px', 'vertical-align': 'top'}),
 
@@ -235,8 +248,10 @@ app.layout = html.Div([
                 clearable=False,
                 style={
                     'width': '200px',
-                    'fontFamily': FONT_FAMILY_REGULAR
-                }
+                    'fontFamily': FONT_FAMILY_REGULAR,
+                    'color': COLORS['dark_text']
+                },
+                className='custom-dropdown'
             )
         ], style={'display': 'inline-block', 'margin-right': '20px', 'vertical-align': 'top'}),
 
@@ -258,10 +273,30 @@ app.layout = html.Div([
                 clearable=False,
                 style={
                     'width': '250px',
-                    'fontFamily': FONT_FAMILY_REGULAR
-                }
+                    'fontFamily': FONT_FAMILY_REGULAR,
+                    'color': COLORS['dark_text']
+                },
+                className='custom-dropdown'
             )
-        ], style={'display': 'inline-block', 'margin-right': '20px', 'vertical-align': 'top'})
+        ], style={'display': 'inline-block', 'margin-right': '20px', 'vertical-align': 'top'}),
+
+        html.Button(
+            'Reset Filters',
+            id='reset-button',
+            n_clicks=0,
+            style={
+                'padding': '10px 20px',
+                'backgroundColor': COLORS['darkgreen'],
+                'color': 'white',
+                'border': 'none',
+                'cursor': 'pointer',
+                'marginLeft': '20px',
+                'fontFamily': FONT_FAMILY_REGULAR,
+                'fontSize': '14px',
+                'borderRadius': '4px',
+                'fontWeight': 'bold'
+            }
+        )
 
         # html.Button(
         #     'Refresh Data',
@@ -524,7 +559,7 @@ def update_map_and_table(city_filter, event_type_filter, event_name_filter,
             lon=affected_sites['lon'],
             lat=affected_sites['lat'],
             mode='markers',
-            marker=dict(size=14, color='#FF3333', opacity=0.9),
+            marker=dict(size=14, color='#FF3333', opacity=0.5, line=dict(color='black', width=2)),
             name='Affected Sites',
             hoverinfo='text',
             hovertext=[
@@ -543,7 +578,7 @@ def update_map_and_table(city_filter, event_type_filter, event_name_filter,
             lon=unaffected_sites['lon'],
             lat=unaffected_sites['lat'],
             mode='markers',
-            marker=dict(size=14, color='#00FFFF', opacity=0.9),
+            marker=dict(size=14, color='#00FFFF', opacity=0.5, line=dict(color='black', width=2)),
             name='Unaffected Sites',
             hoverinfo='text',
             hovertext=[
@@ -604,6 +639,18 @@ def update_map_and_table(city_filter, event_type_filter, event_name_filter,
     table_data = filtered_sites[['site_name', 'city', 'max_capacity', 'event_type']].fillna('').to_dict('records') # Removed 'phone', 
 
     return fig, table_data
+
+@app.callback(
+    [Output('city-filter', 'value'),
+     Output('event-type-filter', 'value'),
+     Output('event-name-filter', 'value'),
+     Output('affected-toggle', 'value')],
+    Input('reset-button', 'n_clicks'),
+    prevent_initial_call=True
+)
+def reset_filters(n_clicks):
+    """Reset all filters to default values"""
+    return 'all', 'all', 'all', []
 
 if __name__ == '__main__':
     # For Google Colab, use mode='inline' or 'external'
