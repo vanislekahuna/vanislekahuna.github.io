@@ -278,6 +278,7 @@ app.layout = html.Div([
                 },
                 className='custom-dropdown'
             )
+
         ], style={'display': 'inline-block', 'margin-right': '20px', 'vertical-align': 'top'}),
 
         html.Button(
@@ -298,23 +299,6 @@ app.layout = html.Div([
             }
         )
 
-        # html.Button(
-        #     'Refresh Data',
-        #     id='refresh-button',
-        #     n_clicks=0,
-        #     style={
-        #         'padding': '10px 20px',
-        #         'backgroundColor': COLORS['darkgreen'],
-        #         'color': 'white',
-        #         'border': 'none',
-        #         'cursor': 'pointer',
-        #         'marginLeft': '20px',
-        #         'fontFamily': FONT_FAMILY_REGULAR,
-        #         'fontSize': '14px',
-        #         'borderRadius': '4px',
-        #         'fontWeight': 'bold'
-        #     }
-        # )
     ], style={
         'padding': '20px',
         'backgroundColor': COLORS['dark_bg'],
@@ -324,7 +308,12 @@ app.layout = html.Div([
     # Map
     dcc.Graph(
         id='emergency-map',
-        style={'height': '600px', 'backgroundColor': COLORS['dark_bg']}
+        style={'height': '600px', 'backgroundColor': COLORS['dark_bg']},
+        config={
+            'scrollZoom': True,
+            'displayModeBar': True,
+            'doubleClick': 'reset+autosize'
+        }
     ),
 
     # Data table
@@ -349,6 +338,8 @@ app.layout = html.Div([
             ],
             style_table={
                 'overflowX': 'auto',
+                'overflowY': 'auto',
+                'maxHeight': '400px',
                 'backgroundColor': COLORS['dark_bg']
             },
             style_cell={
@@ -509,7 +500,7 @@ def update_map_and_table(city_filter, event_type_filter, event_name_filter,
     fig = go.Figure()
 
     # Add emergency polygons
-    for idx, row in poly_geodf.iterrows():
+    for idx, row in poly_data.iterrows():
         # coords = list(row.geometry.exterior.coords)
         # lons, lats = zip(*coords)
         geometry = row.geometry
@@ -545,61 +536,115 @@ def update_map_and_table(city_filter, event_type_filter, event_name_filter,
                       name=f"ID: {row['event_id']} | {row['event_name']} ({row['event_type']})",
                       hoverinfo='text',
                       hovertext=f"<b>{row['event_name']}</b> (Part {row['part_num']} of {row['total_parts']})<br>Type: {row['event_type']}<br>ID: {row['event_id']}",
-                      showlegend=True
+                      showlegend=False
                   )
                 )
 
     # Separate affected and unaffected sites
-    affected_sites = sites_with_events[sites_with_events['event_type'].notna()]
-    unaffected_sites = sites_with_events[sites_with_events['event_type'].isna()]
+    # affected_sites = sites_with_events[sites_with_events['event_type'].notna()]
+    # unaffected_sites = sites_with_events[sites_with_events['event_type'].isna()]
+
+    # Separate affected and unaffected sites (use filtered_sites instead)
+    affected_sites = filtered_sites[filtered_sites['event_type'].notna()]  # <-- CORRECT
+    unaffected_sites = filtered_sites[filtered_sites['event_type'].isna()]  # <-- CORRECT
 
     # Add affected sites (red markers)
     if len(affected_sites) > 0:
-        fig.add_trace(go.Scattermapbox(
-            lon=affected_sites['lon'],
-            lat=affected_sites['lat'],
-            mode='markers',
-            marker=dict(size=14, color='#FF3333', opacity=0.5, line=dict(color='black', width=2)),
-            name='Affected Sites',
-            hoverinfo='text',
-            hovertext=[
-                f"<b>{row['site_name']}</b><br>"
-                f"City: {row['city']}<br>"
-                f"Capacity: {row['max_capacity']}<br>"
-                f"<b>⚠️ Affected by: {row['event_type']}</b>"
-                for _, row in affected_sites.iterrows()
-            ],
-            showlegend=True
-        ))
+        fig.add_trace(
+            go.Scattermapbox(
+                lon=affected_sites['lon'],
+                lat=affected_sites['lat'],
+                mode='markers',
+                marker=dict(size=8, color='#FF3333', opacity=0.8), # Line border didn't work: , line=dict(color='black', width=2)
+                name='Affected Sites',
+                hoverinfo='text',
+                hovertext=[
+                    f"<b>{row['site_name']}</b><br>"
+                    f"City: {row['city']}<br>"
+                    f"Capacity: {row['max_capacity']}<br>"
+                    f"<b>⚠️ Affected by: {row['event_type']}</b>"
+                    for _, row in affected_sites.iterrows()
+                ],
+                showlegend=False
+            )
+        )
 
     # Add unaffected sites (cyan markers)
     if len(unaffected_sites) > 0:
-        fig.add_trace(go.Scattermapbox(
-            lon=unaffected_sites['lon'],
-            lat=unaffected_sites['lat'],
-            mode='markers',
-            marker=dict(size=14, color='#00FFFF', opacity=0.5, line=dict(color='black', width=2)),
-            name='Unaffected Sites',
-            hoverinfo='text',
-            hovertext=[
-                f"<b>{row['site_name']}</b><br>"
-                f"City: {row['city']}<br>"
-                f"Capacity: {row['max_capacity']}<br>"
-                f"Status: Not affected"
-                for _, row in unaffected_sites.iterrows()
-            ],
-            showlegend=True
-        ))
+        fig.add_trace(
+            go.Scattermapbox(
+                lon=unaffected_sites['lon'],
+                lat=unaffected_sites['lat'],
+                mode='markers',
+                marker=dict(size=8, color='#00FFFF', opacity=0.8), # Line border didn't work: , line=dict(color='black', width=2)
+                name='Unaffected Sites',
+                hoverinfo='text',
+                hovertext=[
+                    f"<b>{row['site_name']}</b><br>"
+                    f"City: {row['city']}<br>"
+                    f"Capacity: {row['max_capacity']}<br>"
+                    f"Status: Not affected"
+                    for _, row in unaffected_sites.iterrows()
+                ],
+                showlegend=False
+            )
+        )
+
+    # Adding automatic zoom calculations
+    # Calculate map center and zoom based on filtered sites
+    is_default_view = (city_filter == 'all' and 
+                   event_type_filter == 'all' and 
+                   event_name_filter == 'all' and 
+                   'affected' not in affected_toggle)
+    
+    if is_default_view:
+        # Reset view - use your default coordinates
+        center_lat = 49.17486136570926
+        center_lon = -123.15151571413801
+        zoom_level = 8
+
+    elif len(filtered_sites) > 0:
+        # Get bounding box of filtered sites
+        min_lat = filtered_sites['lat'].min()
+        max_lat = filtered_sites['lat'].max()
+        min_lon = filtered_sites['lon'].min()
+        max_lon = filtered_sites['lon'].max()
+        
+        # Calculate center
+        center_lat = (min_lat + max_lat) / 2
+        center_lon = (min_lon + max_lon) / 2
+        
+        # Calculate zoom level based on bounding box size
+        lat_range = max_lat - min_lat
+        lon_range = max_lon - min_lon
+        max_range = max(lat_range, lon_range)
+        
+        # Rough zoom calculation (you can adjust these values)
+        if max_range > 10:
+            zoom_level = 5
+        elif max_range > 5:
+            zoom_level = 6
+        elif max_range > 2:
+            zoom_level = 7
+        elif max_range > 1:
+            zoom_level = 8
+        elif max_range > 0.5:
+            zoom_level = 9
+        elif max_range > 0.2:
+            zoom_level = 10
+        else:
+            zoom_level = 11
 
     # Brand new update layout with dark mode
     fig.update_layout(
         mapbox=dict(
             style='open-street-map',
-            center=dict(lat=48.441776002871805, lon=-123.37745586330038),
-            zoom=5
+            center=dict(lat=center_lat, lon=center_lon),
+            zoom=zoom_level
         ),
+        dragmode='zoom',
         modebar_add=['pan2d', 'zoom2d', 'zoomIn2d', 'zoomOut2d', 'resetScale2d'],
-        showlegend=True,
+        showlegend=False,
         legend=dict(
             yanchor="top",
             y=0.99,
@@ -619,16 +664,6 @@ def update_map_and_table(city_filter, event_type_filter, event_name_filter,
         hovermode='closest',
         paper_bgcolor=COLORS['dark_bg'],
         plot_bgcolor=COLORS['dark_bg']
-        # title=dict(
-        #     text='BC Emergency Management Dashboard',
-        #     font=dict(
-        #         size=24,
-        #         color=COLORS['dark_header'],
-        #         family=FONT_FAMILY
-        #     ),
-        #     x=0.5,
-        #     xanchor='center'
-        # )
     )
 
     # Configure scroll zoom behavior

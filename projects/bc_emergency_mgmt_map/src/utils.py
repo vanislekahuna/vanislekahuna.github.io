@@ -11,6 +11,7 @@ from shapely.geometry import shape, Point, Polygon
 
 
 
+
 def bc_alerts_api():
     """Retrieves the data from fake the B.C. Emergency Orders and Alerts API"""
 
