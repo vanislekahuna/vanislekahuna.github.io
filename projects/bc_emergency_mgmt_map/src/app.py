@@ -1,3 +1,4 @@
+import json
 import requests
 import numpy as np
 import pandas as pd
@@ -51,7 +52,7 @@ app = Dash(__name__)
 app.layout = html.Div([
     # Header
     html.Div([
-        html.H1('Emergency Sites Dashboard',
+        html.H1('BC Emergency Evacuations Dashboard',
                 style={'display': 'inline-block', 'margin-right': '20px'}),
         html.Div([
             html.Label('Show only affected sites: ',
@@ -118,7 +119,7 @@ app.layout = html.Div([
             columns=[
                 {'name': 'Site Name', 'id': 'site_name'},
                 {'name': 'City', 'id': 'city'},
-                {'name': 'Contact Phone', 'id': 'phone'},
+                # {'name': 'Contact Phone', 'id': 'phone'},
                 {'name': 'Max Capacity', 'id': 'max_capacity'},
                 {'name': 'Event Type', 'id': 'event_type'},
             ],
@@ -176,10 +177,11 @@ def refresh_emergency_data(n_clicks):
 def update_filter_options(selected_city, sites_json, poly_json):
     """Update filter options based on selected city"""
 
-    # Load data
+    # Load data -- CLAUDE FIX
     if sites_json and poly_json:
+        import json
         sites_data = pd.read_json(sites_json)
-        poly_data = gpd.read_file(poly_json)
+        poly_data = gpd.GeoDataFrame.from_features(json.loads(poly_json))  # <-- BETTER FIX
     else:
         sites_data = sites_with_events
         poly_data = poly_geodf
@@ -222,11 +224,12 @@ def update_map_and_table(city_filter, event_type_filter, event_name_filter,
 
     # Load data
     if sites_json and poly_json:
+        import json
         sites_data = pd.read_json(sites_json)
-        poly_data = gpd.read_file(poly_json)
+        poly_data = gpd.GeoDataFrame.from_features(json.loads(poly_json))  # <-- BETTER FIX
     else:
-        sites_data = sites_with_events.copy()
-        poly_data = poly_geodf.copy()
+        sites_data = sites_with_events
+        poly_data = poly_geodf
 
     # Apply filters
     filtered_sites = sites_data.copy()
@@ -369,11 +372,17 @@ def update_map_and_table(city_filter, event_type_filter, event_name_filter,
     # fig.show(config={'scrollZoom': True, 'displayModeBar': True})
 
     # Prepare table data
-    table_data = filtered_sites[['site_name', 'city', 'phone', 'max_capacity', 'event_type']].fillna('').to_dict('records')
+    table_data = filtered_sites[['site_name', 'city', 'max_capacity', 'event_type']].fillna('').to_dict('records') # Removed 'phone', 
 
     return fig, table_data
 
 if __name__ == '__main__':
     # For Google Colab, use mode='inline' or 'external'
     # For local Jupyter, use mode='inline' or mode='jupyterlab'
-    app.run(port=8050, debug=False, use_reloader=False)
+    # app.run(port=8050, debug=False, use_reloader=False)
+    app.run(
+        debug=True,
+        dev_tools_hot_reload=True,
+        use_reloader=False,  # Avoids Windows signal issues
+        port=8050
+    )
