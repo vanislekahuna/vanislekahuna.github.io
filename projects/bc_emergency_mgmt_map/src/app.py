@@ -127,160 +127,74 @@ app.index_string = '''
 </html>
 '''
 
-# App layout
-# app.layout = html.Div([
-#     # Header
-#     html.Div([
-#         html.H1('BC Emergency Evacuations Dashboard',
-#                 style={
-#                     'display': 'inline-block', 
-#                     'margin-right': '20px',
-                    
-#                     # RECENT ADDITION
-#                     'color': COLORS['dark_header'],
-#                     'fontFamily': FONT_FAMILY,
-#                     'fontSize': '32px',
-#                     'fontWeight': 'bold'
-#                     }
-#                 ),
-#         html.Div([
-#             html.Label('Show only affected sites: ',
-#                       style={
-#                           'margin-right': '10px',
-#                           # 'font-weight': 'bold',
-
-#                           # RECENT ADDITION
-#                           'fontFamily': FONT_FAMILY, 
-#                           'fontWeight': 'bold', 
-#                           'color': COLORS['dark_text']
-#                           }
-#                         ),
-#             dcc.Checklist(
-#                 id='affected-toggle',
-#                 options=[{'label': '', 'value': 'affected'}],
-#                 value=[],
-#                 style={'display': 'inline-block'}
-#             )
-#         ], style={'display': 'inline-block', 'float': 'right', 'margin-top': '20px'})
-#     ], style={'padding': '20px', 'background-color': '#f0f0f0', 'border-bottom': '2px solid #ccc'}),
-
-#     # Controls row
-#     html.Div([
-#         html.Div([
-#             html.Label('Filter by City:', style={'font-weight': 'bold'}),
-#             dcc.Dropdown(
-#                 id='city-filter',
-#                 options=[{'label': 'All Cities', 'value': 'all'}] +
-#                         [{'label': city, 'value': city} for city in sorted(sites_df['city'].unique())],
-#                 value='all',
-#                 clearable=False,
-#                 style={'width': '200px'}
-#             )
-#         ], style={'display': 'inline-block', 'margin-right': '20px'}),
-
-#         html.Div([
-#             html.Label('Filter by Event Type:', style={'font-weight': 'bold'}),
-#             dcc.Dropdown(
-#                 id='event-type-filter',
-#                 options=[{'label': 'All Types', 'value': 'all'}],
-#                 value='all',
-#                 clearable=False,
-#                 style={'width': '200px'}
-#             )
-#         ], style={'display': 'inline-block', 'margin-right': '20px'}),
-
-#         html.Div([
-#             html.Label('Filter by Event Name:', style={'font-weight': 'bold'}),
-#             dcc.Dropdown(
-#                 id='event-name-filter',
-#                 options=[{'label': 'All Events', 'value': 'all'}],
-#                 value='all',
-#                 clearable=False,
-#                 style={'width': '250px'}
-#             )
-#         ], style={'display': 'inline-block', 'margin-right': '20px'}),
-
-#         html.Button('Refresh Emergency Data', id='refresh-button', n_clicks=0,
-#                    style={'padding': '10px 20px', 'background-color': '#4CAF50',
-#                          'color': 'white', 'border': 'none', 'cursor': 'pointer',
-#                          'margin-left': '20px'})
-#     ], style={'padding': '20px'}),
-
-#     # Map
-#     dcc.Graph(id='emergency-map', style={'height': '600px'}),
-
-#     # Data table
-#     html.Div([
-#         html.H3('Site Details'),
-#         dash_table.DataTable(
-#             id='sites-table',
-#             columns=[
-#                 {'name': 'Site Name', 'id': 'site_name'},
-#                 {'name': 'City', 'id': 'city'},
-#                 # {'name': 'Contact Phone', 'id': 'phone'},
-#                 {'name': 'Max Capacity', 'id': 'max_capacity'},
-#                 {'name': 'Event Type', 'id': 'event_type'},
-#             ],
-#             style_table={'overflowX': 'auto'},
-#             style_cell={'textAlign': 'left', 'padding': '10px'},
-#             style_header={'backgroundColor': '#f0f0f0', 'fontWeight': 'bold'},
-#             style_data_conditional=[
-#                 {
-#                     'if': {'filter_query': '{event_type} != \"\"'},
-#                     'backgroundColor': '#fff3cd',
-#                 }
-#             ],
-#             page_size=15
-#         )
-#     ], style={'padding': '20px'}),
-
-#     # Hidden div to store data
-#     html.Div(id='emergency-data-store', style={'display': 'none'}),
-#     html.Div(id='sites-data-store', style={'display': 'none'})
-# ])
-
+# App Layout
 app.layout = html.Div([
     # Header
-    html.Div([
-        html.H1(
-            'Emergency Sites Dashboard',
-            style={
-                'display': 'inline-block',
-                'margin-right': '20px',
-                'color': COLORS['dark_header'],
-                'fontFamily': FONT_FAMILY,
-                'fontSize': '32px',
-                'fontWeight': 'bold'
-            }
-        ),
-        html.Div([
-            html.Label(
-                'Show only affected sites: ',
+    html.Div(
+        [
+            html.H1(
+                'BC Emergency Management Dashboard',
                 style={
-                    'margin-right': '10px',
+                    'display': 'inline-block',
+                    'margin-right': '20px',
+                    'color': COLORS['dark_header'],
                     'fontFamily': FONT_FAMILY,
-                    'fontWeight': 'bold',
-                    'color': COLORS['dark_text']
+                    'fontSize': '32px',
+                    'fontWeight': 'bold'
                 }
             ),
-            dcc.Checklist(
-                id='affected-toggle',
-                options=[{'label': '', 'value': 'affected'}],
-                value=[],
-                style={'display': 'inline-block'}
+
+            html.Button(
+                'Refresh Data',
+                id='refresh-button',
+                n_clicks=0,
+                style={
+                    'padding': '10px 20px',
+                    'backgroundColor': COLORS['darkgreen'],
+                    'color': 'white',
+                    'border': 'none',
+                    'cursor': 'pointer',
+                    'marginLeft': '20px',
+                    'fontFamily': FONT_FAMILY_REGULAR,
+                    'fontSize': '14px',
+                    'borderRadius': '4px',
+                    'fontWeight': 'bold'
+                }
+            ),
+
+            html.Div(
+                [
+                    html.Label(
+                        'Show only affected sites: ',
+                        style={
+                            'margin-right': '10px',
+                            'fontFamily': FONT_FAMILY,
+                            'fontWeight': 'bold',
+                            'color': COLORS['dark_text']
+                        }
+                    ),
+                    dcc.Checklist(
+                        id='affected-toggle',
+                        options=[{'label': '', 'value': 'affected'}],
+                        value=[],
+                        style={'display': 'inline-block'}
+                    )
+                ], 
+                style={'display': 'inline-block', 'float': 'right', 'margin-top': '20px'}
             )
-        ], style={'display': 'inline-block', 'float': 'right', 'margin-top': '20px'})
-    ], style={
-        'padding': '20px',
-        'backgroundColor': COLORS['dark_bg'],
-        'borderBottom': f'2px solid {COLORS["dark_border"]}'
-    }),
+        ], 
+        style={
+            'padding': '20px',
+            'backgroundColor': COLORS['dark_bg'],
+            'borderBottom': f'2px solid {COLORS["dark_border"]}'
+        }
+    ),
 
     # Controls row
     html.Div([
         html.Div([
             html.Label(
-                'Filter by City:',
+                'City:',
                 style={
                     'fontFamily': FONT_FAMILY,
                     'fontWeight': 'bold',
@@ -289,6 +203,7 @@ app.layout = html.Div([
                     'display': 'block'
                 }
             ),
+
             dcc.Dropdown(
                 id='city-filter',
                 options=[{'label': 'All Cities', 'value': 'all'}] +
@@ -304,7 +219,7 @@ app.layout = html.Div([
 
         html.Div([
             html.Label(
-                'Filter by Event Type:',
+                'Event Type:',
                 style={
                     'fontFamily': FONT_FAMILY,
                     'fontWeight': 'bold',
@@ -327,7 +242,7 @@ app.layout = html.Div([
 
         html.Div([
             html.Label(
-                'Filter by Event Name:',
+                'Event Name:',
                 style={
                     'fontFamily': FONT_FAMILY,
                     'fontWeight': 'bold',
@@ -346,25 +261,25 @@ app.layout = html.Div([
                     'fontFamily': FONT_FAMILY_REGULAR
                 }
             )
-        ], style={'display': 'inline-block', 'margin-right': '20px', 'vertical-align': 'top'}),
+        ], style={'display': 'inline-block', 'margin-right': '20px', 'vertical-align': 'top'})
 
-        html.Button(
-            'Refresh Emergency Data',
-            id='refresh-button',
-            n_clicks=0,
-            style={
-                'padding': '10px 20px',
-                'backgroundColor': COLORS['darkgreen'],
-                'color': 'white',
-                'border': 'none',
-                'cursor': 'pointer',
-                'marginLeft': '20px',
-                'fontFamily': FONT_FAMILY_REGULAR,
-                'fontSize': '14px',
-                'borderRadius': '4px',
-                'fontWeight': 'bold'
-            }
-        )
+        # html.Button(
+        #     'Refresh Data',
+        #     id='refresh-button',
+        #     n_clicks=0,
+        #     style={
+        #         'padding': '10px 20px',
+        #         'backgroundColor': COLORS['darkgreen'],
+        #         'color': 'white',
+        #         'border': 'none',
+        #         'cursor': 'pointer',
+        #         'marginLeft': '20px',
+        #         'fontFamily': FONT_FAMILY_REGULAR,
+        #         'fontSize': '14px',
+        #         'borderRadius': '4px',
+        #         'fontWeight': 'bold'
+        #     }
+        # )
     ], style={
         'padding': '20px',
         'backgroundColor': COLORS['dark_bg'],
@@ -641,37 +556,6 @@ def update_map_and_table(city_filter, event_type_filter, event_name_filter,
             showlegend=True
         ))
 
-    # Update layout with VISIBLE dark mode style
-    # fig.update_layout(
-    #     mapbox=dict(
-    #         style='open-street-map',   # 'carto-darkmatter',
-    #         center=dict(lat=48.441776002871805, lon=-123.37745586330038),
-    #         zoom=5
-    #     ),
-    #     modebar_add=['pan2d', 'zoom2d', 'zoomIn2d', 'zoomOut2d', 'resetScale2d'],
-    #     showlegend=True,
-    #     legend=dict(
-    #         yanchor="top",
-    #         y=0.99,
-    #         xanchor="left",
-    #         x=0.01,
-    #         bgcolor='rgba(30,30,30,0.9)',
-    #         bordercolor='white',
-    #         borderwidth=1,
-    #         font=dict(color='white', size=10)
-    #     ),
-    #     margin=dict(l=0, r=0, t=40, b=0),
-    #     height=800,
-    #     hovermode='closest',
-    #     paper_bgcolor='#1a1a1a',
-    #     title=dict(
-    #         text='BC Emergency Management Dashboard',
-    #         font=dict(size=24, color='white'),
-    #         x=0.5,
-    #         xanchor='center'
-    #     )
-    # )
-
     # Brand new update layout with dark mode
     fig.update_layout(
         mapbox=dict(
@@ -699,17 +583,17 @@ def update_map_and_table(city_filter, event_type_filter, event_name_filter,
         height=800,
         hovermode='closest',
         paper_bgcolor=COLORS['dark_bg'],
-        plot_bgcolor=COLORS['dark_bg'],
-        title=dict(
-            text='BC Emergency Management Dashboard',
-            font=dict(
-                size=24,
-                color=COLORS['dark_header'],
-                family=FONT_FAMILY
-            ),
-            x=0.5,
-            xanchor='center'
-        )
+        plot_bgcolor=COLORS['dark_bg']
+        # title=dict(
+        #     text='BC Emergency Management Dashboard',
+        #     font=dict(
+        #         size=24,
+        #         color=COLORS['dark_header'],
+        #         family=FONT_FAMILY
+        #     ),
+        #     x=0.5,
+        #     xanchor='center'
+        # )
     )
 
     # Configure scroll zoom behavior
