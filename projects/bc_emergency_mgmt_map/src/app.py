@@ -1,4 +1,5 @@
 import json
+import os
 import requests
 import numpy as np
 import pandas as pd
@@ -690,10 +691,11 @@ def reset_filters(n_clicks):
 if __name__ == '__main__':
     # For Google Colab, use mode='inline' or 'external'
     # For local Jupyter, use mode='inline' or mode='jupyterlab'
-    # app.run(port=8050, debug=False, use_reloader=False)
-    app.run(
-        debug=True,
-        dev_tools_hot_reload=True,
-        use_reloader=False,  # Avoids Windows signal issues
-        port=8050
-    )
+    port = int(os.environ.get('PORT', 8050))
+    app.run(host='0.0.0.0', port=port, debug=False)
+    # app.run(
+    #     debug=True,
+    #     dev_tools_hot_reload=True,
+    #     use_reloader=False,  # Avoids Windows signal issues
+    #     port=8050
+    # )
