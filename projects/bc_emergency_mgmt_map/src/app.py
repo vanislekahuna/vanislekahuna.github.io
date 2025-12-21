@@ -1,8 +1,5 @@
-<<<<<<< HEAD
 import json
 import os
-=======
->>>>>>> 05a612ff867b612a7e92a4f61b7b0051891e20d1
 import requests
 import numpy as np
 import pandas as pd
@@ -20,15 +17,7 @@ from utils import *
 # DASH APP
 # ============================================================================
 
-<<<<<<< HEAD
 # Initializing data with some diagnostics...
-=======
-# Initialize data
-# poly_geodf = bc_alerts_api()
-# sites_df = retrieve_site_data()
-# sites_with_events = check_sites_in_emergencies(sites_df, poly_geodf)
-
->>>>>>> 05a612ff867b612a7e92a4f61b7b0051891e20d1
 print("Fetching emergency data...")
 poly_geodf = bc_alerts_api()
 print(f"✓ Got {len(poly_geodf)} emergency events")
@@ -53,7 +42,6 @@ EVENT_COLORS = {
     'Order': 'rgb(251, 159, 157)',
 }
 
-<<<<<<< HEAD
 COLORS = {
     'dark_bg': '#00060e',
     'dark_text': '#e4e4e4',
@@ -213,33 +201,10 @@ app.layout = html.Div([
             'borderBottom': f'2px solid {COLORS["dark_border"]}'
         }
     ),
-=======
-# Initialize Dash app
-app = Dash(__name__)
-
-# App layout
-app.layout = html.Div([
-    # Header
-    html.Div([
-        html.H1('Emergency Sites Dashboard',
-                style={'display': 'inline-block', 'margin-right': '20px'}),
-        html.Div([
-            html.Label('Show only affected sites: ',
-                      style={'margin-right': '10px', 'font-weight': 'bold'}),
-            dcc.Checklist(
-                id='affected-toggle',
-                options=[{'label': '', 'value': 'affected'}],
-                value=[],
-                style={'display': 'inline-block'}
-            )
-        ], style={'display': 'inline-block', 'float': 'right', 'margin-top': '20px'})
-    ], style={'padding': '20px', 'background-color': '#f0f0f0', 'border-bottom': '2px solid #ccc'}),
->>>>>>> 05a612ff867b612a7e92a4f61b7b0051891e20d1
 
     # Controls row
     html.Div([
         html.Div([
-<<<<<<< HEAD
             html.Label(
                 'City:',
                 style={
@@ -251,16 +216,12 @@ app.layout = html.Div([
                 }
             ),
 
-=======
-            html.Label('Filter by City:', style={'font-weight': 'bold'}),
->>>>>>> 05a612ff867b612a7e92a4f61b7b0051891e20d1
             dcc.Dropdown(
                 id='city-filter',
                 options=[{'label': 'All Cities', 'value': 'all'}] +
                         [{'label': city, 'value': city} for city in sorted(sites_df['city'].unique())],
                 value='all',
                 clearable=False,
-<<<<<<< HEAD
                 style={
                     'width': '200px',
                     'fontFamily': FONT_FAMILY_REGULAR,
@@ -281,20 +242,11 @@ app.layout = html.Div([
                     'display': 'block'
                 }
             ),
-=======
-                style={'width': '200px'}
-            )
-        ], style={'display': 'inline-block', 'margin-right': '20px'}),
-
-        html.Div([
-            html.Label('Filter by Event Type:', style={'font-weight': 'bold'}),
->>>>>>> 05a612ff867b612a7e92a4f61b7b0051891e20d1
             dcc.Dropdown(
                 id='event-type-filter',
                 options=[{'label': 'All Types', 'value': 'all'}],
                 value='all',
                 clearable=False,
-<<<<<<< HEAD
                 style={
                     'width': '200px',
                     'fontFamily': FONT_FAMILY_REGULAR,
@@ -315,20 +267,11 @@ app.layout = html.Div([
                     'display': 'block'
                 }
             ),
-=======
-                style={'width': '200px'}
-            )
-        ], style={'display': 'inline-block', 'margin-right': '20px'}),
-
-        html.Div([
-            html.Label('Filter by Event Name:', style={'font-weight': 'bold'}),
->>>>>>> 05a612ff867b612a7e92a4f61b7b0051891e20d1
             dcc.Dropdown(
                 id='event-name-filter',
                 options=[{'label': 'All Events', 'value': 'all'}],
                 value='all',
                 clearable=False,
-<<<<<<< HEAD
                 style={
                     'width': '250px',
                     'fontFamily': FONT_FAMILY_REGULAR,
@@ -385,24 +328,6 @@ app.layout = html.Div([
                 'marginBottom': '15px'
             }
         ),
-=======
-                style={'width': '250px'}
-            )
-        ], style={'display': 'inline-block', 'margin-right': '20px'}),
-
-        html.Button('Refresh Emergency Data', id='refresh-button', n_clicks=0,
-                   style={'padding': '10px 20px', 'background-color': '#4CAF50',
-                         'color': 'white', 'border': 'none', 'cursor': 'pointer',
-                         'margin-left': '20px'})
-    ], style={'padding': '20px'}),
-
-    # Map
-    dcc.Graph(id='emergency-map', style={'height': '600px'}),
-
-    # Data table
-    html.Div([
-        html.H3('Site Details'),
->>>>>>> 05a612ff867b612a7e92a4f61b7b0051891e20d1
         dash_table.DataTable(
             id='sites-table',
             columns=[
@@ -412,7 +337,6 @@ app.layout = html.Div([
                 {'name': 'Max Capacity', 'id': 'max_capacity'},
                 {'name': 'Event Type', 'id': 'event_type'},
             ],
-<<<<<<< HEAD
             style_table={
                 'overflowX': 'auto',
                 'overflowY': 'auto',
@@ -445,41 +369,24 @@ app.layout = html.Div([
                     'if': {'state': 'active'},
                     'backgroundColor': '#0a2540',
                     'border': f'1px solid {COLORS["blue"]}'
-=======
-            style_table={'overflowX': 'auto'},
-            style_cell={'textAlign': 'left', 'padding': '10px'},
-            style_header={'backgroundColor': '#f0f0f0', 'fontWeight': 'bold'},
-            style_data_conditional=[
-                {
-                    'if': {'filter_query': '{event_type} != \"\"'},
-                    'backgroundColor': '#fff3cd',
->>>>>>> 05a612ff867b612a7e92a4f61b7b0051891e20d1
                 }
             ],
             page_size=15
         )
-<<<<<<< HEAD
     ], style={
         'padding': '20px',
         'backgroundColor': COLORS['dark_bg']
     }),
-=======
-    ], style={'padding': '20px'}),
->>>>>>> 05a612ff867b612a7e92a4f61b7b0051891e20d1
 
     # Hidden div to store data
     html.Div(id='emergency-data-store', style={'display': 'none'}),
     html.Div(id='sites-data-store', style={'display': 'none'})
-<<<<<<< HEAD
 ], 
 style={
     'backgroundColor': COLORS['dark_bg'],
     'minHeight': '100vh',
     'fontFamily': FONT_FAMILY_REGULAR
 })
-=======
-])
->>>>>>> 05a612ff867b612a7e92a4f61b7b0051891e20d1
 
 
 # ============================================================================
@@ -517,18 +424,11 @@ def refresh_emergency_data(n_clicks):
 def update_filter_options(selected_city, sites_json, poly_json):
     """Update filter options based on selected city"""
 
-<<<<<<< HEAD
     # Load data -- CLAUDE FIX
     if sites_json and poly_json:
         import json
         sites_data = pd.read_json(sites_json)
         poly_data = gpd.GeoDataFrame.from_features(json.loads(poly_json))  # <-- BETTER FIX
-=======
-    # Load data
-    if sites_json and poly_json:
-        sites_data = pd.read_json(sites_json)
-        poly_data = gpd.read_file(poly_json)
->>>>>>> 05a612ff867b612a7e92a4f61b7b0051891e20d1
     else:
         sites_data = sites_with_events
         poly_data = poly_geodf
@@ -571,20 +471,12 @@ def update_map_and_table(city_filter, event_type_filter, event_name_filter,
 
     # Load data
     if sites_json and poly_json:
-<<<<<<< HEAD
         import json
         sites_data = pd.read_json(sites_json)
         poly_data = gpd.GeoDataFrame.from_features(json.loads(poly_json))  # <-- BETTER FIX
     else:
         sites_data = sites_with_events
         poly_data = poly_geodf
-=======
-        sites_data = pd.read_json(sites_json)
-        poly_data = gpd.read_file(poly_json)
-    else:
-        sites_data = sites_with_events.copy()
-        poly_data = poly_geodf.copy()
->>>>>>> 05a612ff867b612a7e92a4f61b7b0051891e20d1
 
     # Apply filters
     filtered_sites = sites_data.copy()
@@ -609,11 +501,7 @@ def update_map_and_table(city_filter, event_type_filter, event_name_filter,
     fig = go.Figure()
 
     # Add emergency polygons
-<<<<<<< HEAD
     for idx, row in poly_data.iterrows():
-=======
-    for idx, row in poly_geodf.iterrows():
->>>>>>> 05a612ff867b612a7e92a4f61b7b0051891e20d1
         # coords = list(row.geometry.exterior.coords)
         # lons, lats = zip(*coords)
         geometry = row.geometry
@@ -649,16 +537,11 @@ def update_map_and_table(city_filter, event_type_filter, event_name_filter,
                       name=f"ID: {row['event_id']} | {row['event_name']} ({row['event_type']})",
                       hoverinfo='text',
                       hovertext=f"<b>{row['event_name']}</b> (Part {row['part_num']} of {row['total_parts']})<br>Type: {row['event_type']}<br>ID: {row['event_id']}",
-<<<<<<< HEAD
                       showlegend=False
-=======
-                      showlegend=True
->>>>>>> 05a612ff867b612a7e92a4f61b7b0051891e20d1
                   )
                 )
 
     # Separate affected and unaffected sites
-<<<<<<< HEAD
     # affected_sites = sites_with_events[sites_with_events['event_type'].notna()]
     # unaffected_sites = sites_with_events[sites_with_events['event_type'].isna()]
 
@@ -763,64 +646,11 @@ def update_map_and_table(city_filter, event_type_filter, event_name_filter,
         dragmode='zoom',
         modebar_add=['pan2d', 'zoom2d', 'zoomIn2d', 'zoomOut2d', 'resetScale2d'],
         showlegend=False,
-=======
-    affected_sites = sites_with_events[sites_with_events['event_type'].notna()]
-    unaffected_sites = sites_with_events[sites_with_events['event_type'].isna()]
-
-    # Add affected sites (red markers)
-    if len(affected_sites) > 0:
-        fig.add_trace(go.Scattermapbox(
-            lon=affected_sites['lon'],
-            lat=affected_sites['lat'],
-            mode='markers',
-            marker=dict(size=14, color='#FF3333', opacity=0.9),
-            name='Affected Sites',
-            hoverinfo='text',
-            hovertext=[
-                f"<b>{row['site_name']}</b><br>"
-                f"City: {row['city']}<br>"
-                f"Capacity: {row['max_capacity']}<br>"
-                f"<b>⚠️ Affected by: {row['event_type']}</b>"
-                for _, row in affected_sites.iterrows()
-            ],
-            showlegend=True
-        ))
-
-    # Add unaffected sites (cyan markers)
-    if len(unaffected_sites) > 0:
-        fig.add_trace(go.Scattermapbox(
-            lon=unaffected_sites['lon'],
-            lat=unaffected_sites['lat'],
-            mode='markers',
-            marker=dict(size=14, color='#00FFFF', opacity=0.9),
-            name='Unaffected Sites',
-            hoverinfo='text',
-            hovertext=[
-                f"<b>{row['site_name']}</b><br>"
-                f"City: {row['city']}<br>"
-                f"Capacity: {row['max_capacity']}<br>"
-                f"Status: Not affected"
-                for _, row in unaffected_sites.iterrows()
-            ],
-            showlegend=True
-        ))
-
-    # Update layout with VISIBLE dark mode style
-    fig.update_layout(
-        mapbox=dict(
-            style='open-street-map',   # 'carto-darkmatter',
-            center=dict(lat=48.441776002871805, lon=-123.37745586330038),
-            zoom=5
-        ),
-        modebar_add=['pan2d', 'zoom2d', 'zoomIn2d', 'zoomOut2d', 'resetScale2d'],
-        showlegend=True,
->>>>>>> 05a612ff867b612a7e92a4f61b7b0051891e20d1
         legend=dict(
             yanchor="top",
             y=0.99,
             xanchor="left",
             x=0.01,
-<<<<<<< HEAD
             bgcolor='rgba(0, 6, 14, 0.9)',  # Dark background
             bordercolor=COLORS['dark_border'],
             borderwidth=1,
@@ -829,28 +659,12 @@ def update_map_and_table(city_filter, event_type_filter, event_name_filter,
                 size=10,
                 family=FONT_FAMILY_REGULAR
             )
-=======
-            bgcolor='rgba(30,30,30,0.9)',
-            bordercolor='white',
-            borderwidth=1,
-            font=dict(color='white', size=10)
->>>>>>> 05a612ff867b612a7e92a4f61b7b0051891e20d1
         ),
         margin=dict(l=0, r=0, t=40, b=0),
         height=800,
         hovermode='closest',
-<<<<<<< HEAD
         paper_bgcolor=COLORS['dark_bg'],
         plot_bgcolor=COLORS['dark_bg']
-=======
-        paper_bgcolor='#1a1a1a',
-        title=dict(
-            text='BC Emergency Management Dashboard',
-            font=dict(size=24, color='white'),
-            x=0.5,
-            xanchor='center'
-        )
->>>>>>> 05a612ff867b612a7e92a4f61b7b0051891e20d1
     )
 
     # Configure scroll zoom behavior
@@ -858,7 +672,6 @@ def update_map_and_table(city_filter, event_type_filter, event_name_filter,
     # fig.show(config={'scrollZoom': True, 'displayModeBar': True})
 
     # Prepare table data
-<<<<<<< HEAD
     table_data = filtered_sites[['site_name', 'city', 'max_capacity', 'event_type']].fillna('').to_dict('records') # Removed 'phone', 
 
     return fig, table_data
@@ -886,13 +699,3 @@ if __name__ == '__main__':
     #     use_reloader=False,  # Avoids Windows signal issues
     #     port=8050
     # )
-=======
-    table_data = filtered_sites[['site_name', 'city', 'phone', 'max_capacity', 'event_type']].fillna('').to_dict('records')
-
-    return fig, table_data
-
-if __name__ == '__main__':
-    # For Google Colab, use mode='inline' or 'external'
-    # For local Jupyter, use mode='inline' or mode='jupyterlab'
-    app.run(port=8050, debug=False, use_reloader=False)
->>>>>>> 05a612ff867b612a7e92a4f61b7b0051891e20d1
