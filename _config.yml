@@ -11,6 +11,9 @@ description: Bridging Cyberpunk inevitability into Solarpunk possibility.
 # Dark mode toggle:
 theme_mode: [light | dark]
 
+# Dark mode toggle:
+theme_mode: [light | dark]
+
 # URL of your avatar or profile pic (you could use your GitHub profile pic)
 avatar: https://raw.githubusercontent.com/vanislekahuna/jekyll-now/master/images/Twilight-Lycanroc-Klima.png
 
