@@ -45,17 +45,18 @@ EVENT_COLORS = {
 COLORS = {
     'dark_bg': '#00060e',
     'dark_text': '#e4e4e4',
-    'dark_text_secondary': '#f5d5b5',
     'dark_border': '#333',
     'dark_header': '#00ff2b',
     'blue': '#00aeff',
     'green': '#00FF41',
     'darkgreen': '#36ba01',
+    'lycanroc': '#f5d5b5'
 }
 
 # Font family
 FONT_FAMILY = "'Helvetica Neue Bold', 'Helvetica Neue', Helvetica, Arial, sans-serif"
 FONT_FAMILY_REGULAR = "'Helvetica Neue', Helvetica, Arial, sans-serif"
+MONOSPACE = "'Courier New', 'Courier', monospace"
 
 # Initialize Dash app
 app = Dash(__name__)
@@ -84,6 +85,26 @@ app.index_string = '''
                 transform: translateY(-2px);
                 box-shadow: 0 4px 8px rgba(0, 174, 255, 0.3);
                 transition: all 0.3s ease;
+            }
+
+            /* Eraser button hover effect */
+            #reset-button:hover {
+                background-color: #00aeff !important;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 8px rgba(0, 174, 255, 0.3);
+                transition: all 0.3s ease;
+            }
+
+            /* Footer link hover effect */
+            a:hover {
+                color: #00aeff !important;
+                text-decoration: underline;
+                transition: color 0.3s ease;
+            }
+
+            #reset-button:hover img {
+                transform: scale(1.1);
+                transition: transform 0.3s ease;
             }
             
             /* Dropdown styling */
@@ -210,7 +231,7 @@ app.layout = html.Div([
                 style={
                     'fontFamily': FONT_FAMILY,
                     'fontWeight': 'bold',
-                    'color': COLORS['dark_text'],
+                    'color': COLORS['lycanroc'],
                     'marginBottom': '5px',
                     'display': 'block'
                 }
@@ -237,7 +258,7 @@ app.layout = html.Div([
                 style={
                     'fontFamily': FONT_FAMILY,
                     'fontWeight': 'bold',
-                    'color': COLORS['dark_text'],
+                    'color': COLORS['lycanroc'],
                     'marginBottom': '5px',
                     'display': 'block'
                 }
@@ -262,7 +283,7 @@ app.layout = html.Div([
                 style={
                     'fontFamily': FONT_FAMILY,
                     'fontWeight': 'bold',
-                    'color': COLORS['dark_text'],
+                    'color': COLORS['lycanroc'],
                     'marginBottom': '5px',
                     'display': 'block'
                 }
@@ -279,41 +300,132 @@ app.layout = html.Div([
                 },
                 className='custom-dropdown'
             )
-
         ], style={'display': 'inline-block', 'margin-right': '20px', 'vertical-align': 'top'}),
 
         html.Button(
-            'Reset Filters',
+            html.Img(
+                src='https://raw.githubusercontent.com/vanislekahuna/vanislekahuna.github.io/test/images/assets/eraser.png',
+                style={
+                    'height': '34px',
+                    'width': '34px',
+                    'filter': 'brightness(0) saturate(100%) invert(70%) sepia(85%) saturate(445%) hue-rotate(61deg) brightness(101%) contrast(101%)'
+                    # 'filter': 'invert(1)'  # Makes it white if the icon is black
+                }
+            ),
             id='reset-button',
             n_clicks=0,
             style={
-                'padding': '10px 20px',
-                'backgroundColor': COLORS['darkgreen'],
+                'backgroundColor': '#00060e',
                 'color': 'white',
                 'border': 'none',
                 'cursor': 'pointer',
-                'marginLeft': '20px',
-                'fontFamily': FONT_FAMILY_REGULAR,
-                'fontSize': '14px',
+                'marginLeft': '5px',
                 'borderRadius': '4px',
-                'fontWeight': 'bold'
+                'display': 'inline-flex',
+                'alignItems': 'center',
+                'justifyContent': 'center',
+                'height': '44px',  
+                'width': '44px',
+                'verticalAlign': 'bottom'
             }
-        )
+        ),
+
+        # Total Spaces Card
+        html.Div([
+            html.Div(
+                id='total-spaces-number',
+                style={
+                    'fontSize': '24px',
+                    'fontWeight': 'bold',
+                    'color': COLORS['green'],
+                    'fontFamily': FONT_FAMILY,
+                    'marginBottom': '5px'
+                }
+            ),
+            html.Div(
+                'Total Spaces',
+                style={
+                    'fontSize': '12px',
+                    'color': COLORS['dark_text'],
+                    'fontFamily': FONT_FAMILY_REGULAR
+                }
+            )
+        ], style={
+            'display': 'inline-block',
+            'padding': '12px 20px',
+            'border': f'2px solid {COLORS["dark_border"]}',
+            'borderRadius': '4px',
+            'marginLeft': '20px',
+            'minWidth': '120px',
+            'textAlign': 'center',
+            'verticalAlign': 'middle',
+            'height': '74px',
+            'boxSizing': 'border-box',
+            'float': 'right'
+        }),
+
+        # Total Sites Card
+        html.Div([
+            html.Div(
+                id='total-sites-number',
+                style={
+                    'fontSize': '24px',
+                    'fontWeight': 'bold',
+                    'color': COLORS['green'],
+                    'fontFamily': FONT_FAMILY,
+                    'marginBottom': '5px'
+                }
+            ),
+            html.Div(
+                'Total Sites',
+                style={
+                    'fontSize': '12px',
+                    'color': COLORS['dark_text'],
+                    'fontFamily': FONT_FAMILY_REGULAR
+                }
+            )
+        ], style={
+            'display': 'inline-block',
+            'padding': '12px 20px',
+            'border': f'2px solid {COLORS["dark_border"]}',
+            'borderRadius': '4px',
+            'marginLeft': '20px',
+            'minWidth': '120px',
+            'textAlign': 'center',
+            'verticalAlign': 'middle',
+            'height': '74px',  # Match filter height
+            'boxSizing': 'border-box',
+            'float': 'right'
+        }),
 
     ], style={
         'padding': '20px',
-        'backgroundColor': COLORS['dark_bg'],
-        'borderBottom': f'1px solid {COLORS["dark_border"]}'
+        'backgroundColor': COLORS['dark_bg']
+        # 'borderBottom': f'1px solid {COLORS["dark_border"]}'
     }),
 
     # Map
-    dcc.Graph(
-        id='emergency-map',
-        style={'height': '600px', 'backgroundColor': COLORS['dark_bg']},
-        config={
-            'scrollZoom': True,
-            'displayModeBar': True,
-            'doubleClick': 'reset+autosize'
+    html.Div([
+        dcc.Graph(
+            id='emergency-map',
+            style={
+                'height': '500px', 
+                'backgroundColor': 
+                COLORS['dark_bg'],
+                'marginLeft': '20px',
+                'marginRight': '20px',
+            },
+            config={
+                'scrollZoom': True,
+                'displayModeBar': True,
+                'responsive': True,  # Add this
+                'doubleClick': 'reset+autosize'
+            }
+        ),
+    ], style={
+        'backgroundColor': COLORS['dark_bg'],
+        'height': '540px',  # Fixed container height (map + padding)
+        'overflow': 'hidden'  # Prevent overflow
         }
     ),
 
@@ -324,7 +436,8 @@ app.layout = html.Div([
             style={
                 'fontFamily': FONT_FAMILY,
                 'fontWeight': 'bold',
-                'color': COLORS['dark_text'],
+                'paddingTop': '10px',
+                'color': COLORS['lycanroc'],
                 'marginBottom': '15px'
             }
         ),
@@ -363,7 +476,7 @@ app.layout = html.Div([
                 {
                     'if': {'filter_query': '{event_type} != ""'},
                     'backgroundColor': '#3d2a1f',
-                    'color': COLORS['dark_text_secondary']
+                    'color': COLORS['lycanroc']
                 },
                 {
                     'if': {'state': 'active'},
@@ -376,6 +489,28 @@ app.layout = html.Div([
     ], style={
         'padding': '20px',
         'backgroundColor': COLORS['dark_bg']
+    }),
+
+
+    # Adding footer with a link back to main website
+    html.Div([
+        html.A(
+            'C/O VANISLE_KAHUNA',
+            href='https://vanislekahuna.github.io/',
+            target='_self',  # Opens in same tab
+            style={
+                'color': COLORS['lycanroc'],
+                'fontFamily': FONT_FAMILY_REGULAR,
+                # 'fontSize': '12px',
+                'textDecoration': 'none',
+                'fontWeight': 'normal'
+            }
+        )
+    ], style={
+        'padding': '20px',
+        'paddingTop': '10px',
+        'backgroundColor': COLORS['dark_bg'],
+        'textAlign': 'left'
     }),
 
     # Hidden div to store data
@@ -393,6 +528,7 @@ style={
 # CALLBACKS
 # ============================================================================
 
+# Refresh Data button callback
 @app.callback(
     [Output('emergency-data-store', 'children'),
      Output('sites-data-store', 'children')],
@@ -414,6 +550,7 @@ def refresh_emergency_data(n_clicks):
     return poly_json, sites_json
 
 
+# Slicers affecting one another callback
 @app.callback(
     [Output('event-type-filter', 'options'),
      Output('event-name-filter', 'options')],
@@ -453,6 +590,7 @@ def update_filter_options(selected_city, sites_json, poly_json):
     return event_types, event_names
 
 
+# Filter affecting map and table callback
 @app.callback(
     [Output('emergency-map', 'figure'),
      Output('sites-table', 'data')],
@@ -463,7 +601,6 @@ def update_filter_options(selected_city, sites_json, poly_json):
      Input('sites-data-store', 'children'),
      Input('emergency-data-store', 'children')]
 )
-
 
 def update_map_and_table(city_filter, event_type_filter, event_name_filter,
                         affected_toggle, sites_json, poly_json):
@@ -541,13 +678,9 @@ def update_map_and_table(city_filter, event_type_filter, event_name_filter,
                   )
                 )
 
-    # Separate affected and unaffected sites
-    # affected_sites = sites_with_events[sites_with_events['event_type'].notna()]
-    # unaffected_sites = sites_with_events[sites_with_events['event_type'].isna()]
-
     # Separate affected and unaffected sites (use filtered_sites instead)
-    affected_sites = filtered_sites[filtered_sites['event_type'].notna()]  # <-- CORRECT
-    unaffected_sites = filtered_sites[filtered_sites['event_type'].isna()]  # <-- CORRECT
+    affected_sites = filtered_sites[filtered_sites['event_type'].notna()]
+    unaffected_sites = filtered_sites[filtered_sites['event_type'].isna()]
 
     # Add affected sites (red markers)
     if len(affected_sites) > 0:
@@ -577,7 +710,7 @@ def update_map_and_table(city_filter, event_type_filter, event_name_filter,
                 lon=unaffected_sites['lon'],
                 lat=unaffected_sites['lat'],
                 mode='markers',
-                marker=dict(size=8, color='#00FFFF', opacity=0.8), # Line border didn't work: , line=dict(color='black', width=2)
+                marker=dict(size=8, color=COLORS['darkgreen'], opacity=0.8), # Line border didn't work: , line=dict(color='black', width=2)
                 name='Unaffected Sites',
                 hoverinfo='text',
                 hovertext=[
@@ -643,6 +776,8 @@ def update_map_and_table(city_filter, event_type_filter, event_name_filter,
             center=dict(lat=center_lat, lon=center_lon),
             zoom=zoom_level
         ),
+        uirevision='constant',  # Add this line - forces stable state
+        autosize=True,
         dragmode='zoom',
         modebar_add=['pan2d', 'zoom2d', 'zoomIn2d', 'zoomOut2d', 'resetScale2d'],
         showlegend=False,
@@ -669,13 +804,14 @@ def update_map_and_table(city_filter, event_type_filter, event_name_filter,
 
     # Configure scroll zoom behavior
     fig.update_mapboxes(bearing=0, pitch=0)
-    # fig.show(config={'scrollZoom': True, 'displayModeBar': True})
 
     # Prepare table data
     table_data = filtered_sites[['site_name', 'city', 'max_capacity', 'event_type']].fillna('').to_dict('records') # Removed 'phone', 
 
     return fig, table_data
 
+
+# Reset Filters Callback
 @app.callback(
     [Output('city-filter', 'value'),
      Output('event-type-filter', 'value'),
@@ -687,6 +823,58 @@ def update_map_and_table(city_filter, event_type_filter, event_name_filter,
 def reset_filters(n_clicks):
     """Reset all filters to default values"""
     return 'all', 'all', 'all', []
+
+
+# Update metric cards callback
+@app.callback(
+    [Output('total-sites-number', 'children'),
+     Output('total-spaces-number', 'children')],
+    [Input('city-filter', 'value'),
+     Input('event-type-filter', 'value'),
+     Input('event-name-filter', 'value'),
+     Input('affected-toggle', 'value'),
+     Input('sites-data-store', 'children'),
+     Input('emergency-data-store', 'children')]
+)
+def update_metric_cards(city_filter, event_type_filter, event_name_filter,
+                       affected_toggle, sites_json, poly_json):
+    """Update the metric cards based on filters"""
+    
+    # Load data (same logic as update_map_and_table)
+    if sites_json and poly_json:
+        import json
+        sites_data = pd.read_json(sites_json)
+    else:
+        sites_data = sites_with_events.copy()
+    
+    # Apply filters (same logic as update_map_and_table)
+    filtered_sites = sites_data.copy()
+    
+    # City filter
+    if city_filter != 'all':
+        filtered_sites = filtered_sites[filtered_sites['city'] == city_filter]
+    
+    # Event type filter
+    if event_type_filter != 'all':
+        filtered_sites = filtered_sites[filtered_sites['event_type'] == event_type_filter]
+    
+    # Event name filter
+    if event_name_filter != 'all':
+        filtered_sites = filtered_sites[filtered_sites['event_name'] == event_name_filter]
+    
+    # Affected toggle
+    if 'affected' in affected_toggle:
+        filtered_sites = filtered_sites[filtered_sites['event_type'].notna()]
+    
+    # Calculate metrics
+    total_sites = len(filtered_sites)
+    total_spaces = int(filtered_sites['max_capacity'].sum())
+    
+    # Format with commas
+    total_sites_formatted = f"{total_sites:,}"
+    total_spaces_formatted = f"{total_spaces:,}"
+    
+    return total_sites_formatted, total_spaces_formatted
 
 if __name__ == '__main__':
     # For Google Colab, use mode='inline' or 'external'
