@@ -1,11 +1,11 @@
 # vanislekahuna.github.io
 
-Personal portfolio and blog exploring the intersection of Machine Learning and Climate Action to ensure a BioCyberse future!
+Personal portfolio and blog exploring the intersection of Machine Learning and Climate Action to ensure that the future is Solarpunk!
 
 
-## What is BioCyberse?
+## Bridging Cyberpunk inevitability into Solarpunk possibility
 
-**BioCyberse** is a vision of the future where safe and responsible AI augments our fight against climate change. By applying Machine Learning towards domains such as Wildfire Management or effective Energy Policy, I remain optimistic that a golden age of humanity can be actualized so that future generations can prosper from the advancements today. 
+My vision of the future transforms the cyberpunk trajectory we're on, where technology increasingly dominates nature, into a solarpunk reality where AI becomes nature's ally. A future where safe and responsible AI augments our fight against climate change. By enhancing human intelligence with machine learning for climate applications like wildfire prediction, ecosystem restoration, or effective energy policy, we can redirect our technological momentum from extraction to symbiosis. By changing our trajectory, a golden age of humanity can be actualized with the technological advancements of today so that the next generation not only inherits a habitable planet, but a thriving one.
 
 
 ## Technology Stack
@@ -28,6 +28,7 @@ vanislekahuna.github.io/
 ├── _sass/                  # SCSS partials
 ├── images/                 # Image assets
 ├── js/                     # JavaScript files
+├── projects/              # Custom project files
 ├── about.md               # About page
 ├── climate-ai.html        # Climate Change/AI page
 ├── index.html             # Homepage (blog listing)
