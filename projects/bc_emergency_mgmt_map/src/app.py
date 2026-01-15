@@ -468,14 +468,16 @@ app.layout = html.Div([
                 id='search-button',
                 n_clicks=0,
                 style={
-                    'padding': '10px 15px',
+                    'padding': '8px 12px',
                     'backgroundColor': '#1a1a1a',
                     'color': 'white',
                     'border': 'none',
                     'cursor': 'pointer',
                     'borderRadius': '0 4px 4px 0',
                     'fontSize': '16px',
-                    'marginLeft': '-1px'
+                    'marginLeft': '-1px',
+                    'height': '38px',               # ADD - matches dropdown height
+                    'verticalAlign': 'top'          # ADD - aligns with dropdown
                 }
             ),
             html.Div(
@@ -930,13 +932,21 @@ def update_map_and_table(city_filter, event_type_filter, event_name_filter,
                    event_type_filter == 'all' and 
                    event_name_filter == 'all' and 
                    'affected' not in affected_toggle)
+
+    # Priority 1: User searched an address - zoom to that location
+    if user_lat and user_lon:
+        center_lat = user_lat
+        center_lon = user_lon
+        zoom_level = 11  # Close zoom for user location
     
-    if is_default_view:
+    # Priority 2: All filters at default - show BC overview
+    elif is_default_view:
         # Reset view - use your default coordinates
         center_lat = 49.17486136570926
         center_lon = -123.15151571413801
         zoom_level = 8
 
+    # Priority 3: Filters applied - auto-zoom to filtered sites
     elif len(filtered_sites) > 0:
         # Get bounding box of filtered sites
         min_lat = filtered_sites['lat'].min()
@@ -968,6 +978,12 @@ def update_map_and_table(city_filter, event_type_filter, event_name_filter,
             zoom_level = 10
         else:
             zoom_level = 11
+
+    # Priority 4: No sites match filters - default view
+    else:
+        center_lat = 49.17486136570926
+        center_lon = -123.15151571413801
+        zoom_level = 8
 
     # Brand new update layout with dark mode
     fig.update_layout(
