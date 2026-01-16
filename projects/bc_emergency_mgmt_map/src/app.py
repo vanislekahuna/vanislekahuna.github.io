@@ -471,7 +471,7 @@ app.layout = html.Div([
                     'padding': '8px 12px',
                     'backgroundColor': '#1a1a1a',
                     'color': 'white',
-                    'border': 'none',
+                    'border': f'1px solid {COLORS["dark_border"]}',
                     'cursor': 'pointer',
                     'borderRadius': '0 4px 4px 0',
                     'fontSize': '16px',
@@ -1051,10 +1051,13 @@ def reset_filters(n_clicks):
      Input('event-name-filter', 'value'),
      Input('affected-toggle', 'value'),
      Input('sites-data-store', 'children'),
-     Input('emergency-data-store', 'children')]
+     Input('emergency-data-store', 'children'),
+     Input('user-location-store', 'children'),  # NEW
+     Input('selected-radius-store', 'children')]  # NEW
 )
 def update_metric_cards(city_filter, event_type_filter, event_name_filter,
-                       affected_toggle, sites_json, poly_json):
+                       affected_toggle, sites_json, poly_json,
+                       user_location_json, selected_radius): # ADDED PARAMETERS
     """Update the metric cards based on filters"""
     
     # Load data (same logic as update_map_and_table)
@@ -1066,6 +1069,31 @@ def update_metric_cards(city_filter, event_type_filter, event_name_filter,
     
     # Apply filters (same logic as update_map_and_table)
     filtered_sites = sites_data.copy()
+
+    # Parse user location
+    user_lat, user_lon = None, None
+    if user_location_json:
+        try:
+            import json
+            location_data = json.loads(user_location_json)
+            user_lat = location_data['lat']
+            user_lon = location_data['lon']
+        except:
+            pass
+    
+    # Apply radius filter if location exists (SAME AS MAP CALLBACK)
+    if user_lat and user_lon:
+        # from utils import haversine_distance
+        radius_km = float(selected_radius) if selected_radius else 10
+        
+        # Calculate distances
+        filtered_sites['distance_km'] = filtered_sites.apply(
+            lambda row: haversine_distance(user_lat, user_lon, row['lat'], row['lon']),
+            axis=1
+        )
+        
+        # Filter by radius
+        filtered_sites = filtered_sites[filtered_sites['distance_km'] <= radius_km]
     
     # City filter
     if city_filter != 'all':
@@ -1154,7 +1182,7 @@ def handle_location_search(search_clicks, reset_clicks, address):
             error_msg = '⚠️ Please enter an address to search.'
             return None, error_input_style, error_msg, visible_error_style
         
-        from utils import geocode_address
+        # from utils import geocode_address
         lat, lon = geocode_address(address)
         
         if lat and lon:
