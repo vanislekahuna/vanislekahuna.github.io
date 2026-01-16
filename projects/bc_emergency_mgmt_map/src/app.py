@@ -106,6 +106,21 @@ app.index_string = '''
                 transform: scale(1.1);
                 transition: transform 0.3s ease;
             }
+
+            /* Search button hover */
+            #search-button:hover {
+                background-color: #0088cc !important;
+                transform: scale(1.05);
+                transition: all 0.3s ease;
+            }
+
+            /* Radius button hover */
+            button[id^="radius-"]:hover {
+                background-color: #00aeff !important;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 8px rgba(0, 174, 255, 0.3);
+                transition: all 0.3s ease;
+            }
             
             /* Dropdown styling */
             /* Dropdown text color fix */
@@ -429,6 +444,116 @@ app.layout = html.Div([
         }
     ),
 
+    # Location Search Section
+    html.Div([
+        # Search input and button
+        html.Div([
+            dcc.Input(
+                id='address-search',
+                type='text',
+                placeholder='Enter an address here...',
+                style={
+                    'width': '300px',
+                    'padding': '10px',
+                    'backgroundColor': '#1a1a1a',
+                    'color': COLORS['dark_text'],
+                    'border': f'1px solid {COLORS["dark_border"]}',
+                    'borderRadius': '4px 0 0 4px',
+                    'fontFamily': FONT_FAMILY_REGULAR,
+                    'fontSize': '14px'
+                }
+            ),
+            html.Button(
+                '🔍',
+                id='search-button',
+                n_clicks=0,
+                style={
+                    'padding': '8px 12px',
+                    'backgroundColor': '#1a1a1a',
+                    'color': 'white',
+                    'border': f'1px solid {COLORS["dark_border"]}',
+                    'cursor': 'pointer',
+                    'borderRadius': '0 4px 4px 0',
+                    'fontSize': '16px',
+                    'marginLeft': '-1px',
+                    'height': '38px',               # ADD - matches dropdown height
+                    'verticalAlign': 'top'          # ADD - aligns with dropdown
+                }
+            ),
+            html.Div(
+                id='search-error-message',
+                style={
+                    'marginTop': '5px',
+                    'color': '#ff4444',
+                    'fontSize': '12px',
+                    'fontFamily': FONT_FAMILY_REGULAR,
+                    'display': 'none'  # Hidden by default
+                }
+            )
+        ], style={'display': 'inline-block', 'verticalAlign': 'top'}),
+        
+        # Radius buttons
+        html.Div([
+            html.Button(
+                '2 km',
+                id='radius-2km',
+                n_clicks=0,
+                style={
+                    'padding': '10px 20px',
+                    'backgroundColor': '#555',
+                    'color': 'white',
+                    'border': 'none',
+                    'cursor': 'pointer',
+                    'marginLeft': '10px',
+                    'borderRadius': '4px',
+                    'fontFamily': FONT_FAMILY_REGULAR,
+                    'fontSize': '14px'
+                }
+            ),
+            html.Button(
+                '5 km',
+                id='radius-5km',
+                n_clicks=0,
+                style={
+                    'padding': '10px 20px',
+                    'backgroundColor': '#555',
+                    'color': 'white',
+                    'border': 'none',
+                    'cursor': 'pointer',
+                    'marginLeft': '15px',
+                    'borderRadius': '4px',
+                    'fontFamily': FONT_FAMILY_REGULAR,
+                    'fontSize': '14px'
+                }
+            ),
+            html.Button(
+                '10 km',
+                id='radius-10km',
+                n_clicks=0,
+                style={
+                    'padding': '10px 20px',
+                    'backgroundColor': '#555',
+                    'color': 'white',
+                    'border': 'none',
+                    'cursor': 'pointer',
+                    'marginLeft': '10px',
+                    'borderRadius': '4px',
+                    'fontFamily': FONT_FAMILY_REGULAR,
+                    'fontSize': '14px'
+                }
+            )
+        ], id='radius-buttons-container', style={'display': 'inline-block', 'marginLeft': '15px'}),
+        
+    ], style={
+        'padding': '20px',
+        'paddingTop': '0',
+        'backgroundColor': COLORS['dark_bg']
+    }),
+
+    # Hidden divs to store search data
+    html.Div(id='user-location-store', style={'display': 'none'}),
+    html.Div(id='selected-radius-store', style={'display': 'none'}, children='10'),
+
     # Data table
     html.Div([
         html.H3(
@@ -599,11 +724,13 @@ def update_filter_options(selected_city, sites_json, poly_json):
      Input('event-name-filter', 'value'),
      Input('affected-toggle', 'value'),
      Input('sites-data-store', 'children'),
-     Input('emergency-data-store', 'children')]
+     Input('emergency-data-store', 'children'),
+     Input('user-location-store', 'children'),  # NEW
+     Input('selected-radius-store', 'children')]  # NEW
 )
 
 def update_map_and_table(city_filter, event_type_filter, event_name_filter,
-                        affected_toggle, sites_json, poly_json):
+                        affected_toggle, sites_json, poly_json, user_location_json, selected_radius):
     """Update map and table based on filters"""
 
     # Load data
@@ -617,6 +744,29 @@ def update_map_and_table(city_filter, event_type_filter, event_name_filter,
 
     # Apply filters
     filtered_sites = sites_data.copy()
+
+    # Parse user location
+    user_lat, user_lon = None, None
+    if user_location_json:
+        try:
+            location_data = json.loads(user_location_json)
+            user_lat = location_data['lat']
+            user_lon = location_data['lon']
+        except:
+            pass
+    
+    # Apply radius filter if location exists
+    if user_lat and user_lon:
+        radius_km = float(selected_radius) if selected_radius else 10
+        
+        # Calculate distances
+        filtered_sites['distance_km'] = filtered_sites.apply(
+            lambda row: haversine_distance(user_lat, user_lon, row['lat'], row['lon']),
+            axis=1
+        )
+        
+        # Filter by radius
+        filtered_sites = filtered_sites[filtered_sites['distance_km'] <= radius_km]
 
     # City filter
     if city_filter != 'all':
@@ -678,6 +828,58 @@ def update_map_and_table(city_filter, event_type_filter, event_name_filter,
                   )
                 )
 
+    # Add radius circle if user location exists
+    if user_lat and user_lon:
+        radius_km = float(selected_radius) if selected_radius else 10
+        
+        # Create circle points (approximate)
+        import numpy as np
+        circle_lats = []
+        circle_lons = []
+        
+        for angle in np.linspace(0, 360, 100):
+            # Approximate circle (not perfect for large radii, but good enough)
+            angle_rad = np.radians(angle)
+            dx = radius_km / 111.32  # 1 degree latitude ≈ 111.32 km
+            dy = radius_km / (111.32 * np.cos(np.radians(user_lat)))
+            
+            circle_lat = user_lat + dx * np.cos(angle_rad)
+            circle_lon = user_lon + dy * np.sin(angle_rad)
+            
+            circle_lats.append(circle_lat)
+            circle_lons.append(circle_lon)
+        
+        # Add circle
+        fig.add_trace(go.Scattermapbox(
+            lon=circle_lons,
+            lat=circle_lats,
+            mode='lines',
+            fill='toself',
+            fillcolor='rgba(0, 174, 255, 0.1)',
+            line=dict(color=COLORS['blue'], width=2),
+            name=f'{radius_km} km radius',
+            hoverinfo='text',
+            hovertext=f'{radius_km} km radius from your location',
+            showlegend=False
+        ))
+        
+        # Add user location pin
+        fig.add_trace(go.Scattermapbox(
+            lon=[user_lon],
+            lat=[user_lat],
+            mode='markers',
+            marker=dict(
+                size=15,
+                color=COLORS['blue'],
+                opacity=0.8
+                # symbol='marker'  # Pin shape
+            ),
+            name='Your Location',
+            hoverinfo='text',
+            hovertext='<b>Your Location</b>',
+            showlegend=True
+        ))
+
     # Separate affected and unaffected sites (use filtered_sites instead)
     affected_sites = filtered_sites[filtered_sites['event_type'].notna()]
     unaffected_sites = filtered_sites[filtered_sites['event_type'].isna()]
@@ -730,13 +932,21 @@ def update_map_and_table(city_filter, event_type_filter, event_name_filter,
                    event_type_filter == 'all' and 
                    event_name_filter == 'all' and 
                    'affected' not in affected_toggle)
+
+    # Priority 1: User searched an address - zoom to that location
+    if user_lat and user_lon:
+        center_lat = user_lat
+        center_lon = user_lon
+        zoom_level = 11  # Close zoom for user location
     
-    if is_default_view:
+    # Priority 2: All filters at default - show BC overview
+    elif is_default_view:
         # Reset view - use your default coordinates
         center_lat = 49.17486136570926
         center_lon = -123.15151571413801
         zoom_level = 8
 
+    # Priority 3: Filters applied - auto-zoom to filtered sites
     elif len(filtered_sites) > 0:
         # Get bounding box of filtered sites
         min_lat = filtered_sites['lat'].min()
@@ -768,6 +978,12 @@ def update_map_and_table(city_filter, event_type_filter, event_name_filter,
             zoom_level = 10
         else:
             zoom_level = 11
+
+    # Priority 4: No sites match filters - default view
+    else:
+        center_lat = 49.17486136570926
+        center_lon = -123.15151571413801
+        zoom_level = 8
 
     # Brand new update layout with dark mode
     fig.update_layout(
@@ -816,13 +1032,14 @@ def update_map_and_table(city_filter, event_type_filter, event_name_filter,
     [Output('city-filter', 'value'),
      Output('event-type-filter', 'value'),
      Output('event-name-filter', 'value'),
-     Output('affected-toggle', 'value')],
+     Output('affected-toggle', 'value'),
+     Output('address-search', 'value')],  # NEW - clear search box
     Input('reset-button', 'n_clicks'),
     prevent_initial_call=True
 )
 def reset_filters(n_clicks):
     """Reset all filters to default values"""
-    return 'all', 'all', 'all', []
+    return 'all', 'all', 'all', [], ''
 
 
 # Update metric cards callback
@@ -834,10 +1051,13 @@ def reset_filters(n_clicks):
      Input('event-name-filter', 'value'),
      Input('affected-toggle', 'value'),
      Input('sites-data-store', 'children'),
-     Input('emergency-data-store', 'children')]
+     Input('emergency-data-store', 'children'),
+     Input('user-location-store', 'children'),  # NEW
+     Input('selected-radius-store', 'children')]  # NEW
 )
 def update_metric_cards(city_filter, event_type_filter, event_name_filter,
-                       affected_toggle, sites_json, poly_json):
+                       affected_toggle, sites_json, poly_json,
+                       user_location_json, selected_radius): # ADDED PARAMETERS
     """Update the metric cards based on filters"""
     
     # Load data (same logic as update_map_and_table)
@@ -849,6 +1069,31 @@ def update_metric_cards(city_filter, event_type_filter, event_name_filter,
     
     # Apply filters (same logic as update_map_and_table)
     filtered_sites = sites_data.copy()
+
+    # Parse user location
+    user_lat, user_lon = None, None
+    if user_location_json:
+        try:
+            import json
+            location_data = json.loads(user_location_json)
+            user_lat = location_data['lat']
+            user_lon = location_data['lon']
+        except:
+            pass
+    
+    # Apply radius filter if location exists (SAME AS MAP CALLBACK)
+    if user_lat and user_lon:
+        # from utils import haversine_distance
+        radius_km = float(selected_radius) if selected_radius else 10
+        
+        # Calculate distances
+        filtered_sites['distance_km'] = filtered_sites.apply(
+            lambda row: haversine_distance(user_lat, user_lon, row['lat'], row['lon']),
+            axis=1
+        )
+        
+        # Filter by radius
+        filtered_sites = filtered_sites[filtered_sites['distance_km'] <= radius_km]
     
     # City filter
     if city_filter != 'all':
@@ -875,6 +1120,211 @@ def update_metric_cards(city_filter, event_type_filter, event_name_filter,
     total_spaces_formatted = f"{total_spaces:,}"
     
     return total_sites_formatted, total_spaces_formatted
+
+
+###############################
+### NEW Search bar callback ###
+###############################
+@app.callback(
+    [Output('user-location-store', 'children'),
+     Output('address-search', 'style'),        # ADD - for red border
+     Output('search-error-message', 'children'),  # ADD - error text
+     Output('search-error-message', 'style')],    # ADD - show/hide error
+    [Input('search-button', 'n_clicks'),
+     Input('reset-button', 'n_clicks')],
+    [State('address-search', 'value')],
+    prevent_initial_call=True
+)
+def handle_location_search(search_clicks, reset_clicks, address):
+    """Handle address search with error feedback"""
+    from dash import callback_context
+    import json
+    
+    # Default styles
+    default_input_style = {
+        'width': '300px',
+        'padding': '10px',
+        'backgroundColor': '#1a1a1a',
+        'color': COLORS['dark_text'],
+        'border': f'1px solid {COLORS["dark_border"]}',
+        'borderRadius': '4px 0 0 4px',
+        'fontFamily': FONT_FAMILY_REGULAR,
+        'fontSize': '14px'
+    }
+    
+    error_input_style = default_input_style.copy()
+    error_input_style['border'] = '2px solid #ff4444'  # Red border
+    
+    hidden_error_style = {
+        'marginTop': '5px',
+        'color': '#ff4444',
+        'fontSize': '12px',
+        'fontFamily': FONT_FAMILY_REGULAR,
+        'display': 'none'
+    }
+    
+    visible_error_style = hidden_error_style.copy()
+    visible_error_style['display'] = 'block'
+    
+    if not callback_context.triggered:
+        return None, default_input_style, '', hidden_error_style
+    
+    button_id = callback_context.triggered[0]['prop_id'].split('.')[0]
+    
+    # Reset button clicked
+    if button_id == 'reset-button':
+        return None, default_input_style, '', hidden_error_style
+    
+    # Search button clicked
+    if button_id == 'search-button':
+        if not address or address.strip() == '':
+            # Empty search
+            error_msg = '⚠️ Please enter an address to search.'
+            return None, error_input_style, error_msg, visible_error_style
+        
+        # from utils import geocode_address
+        lat, lon = geocode_address(address)
+        
+        if lat and lon:
+            # Success!
+            location_data = json.dumps({'lat': lat, 'lon': lon})
+            return location_data, default_input_style, '', hidden_error_style
+        else:
+            # Geocoding failed - generate helpful suggestion
+            error_msg = generate_search_suggestion(address)
+            return None, error_input_style, error_msg, visible_error_style
+    
+    return None, default_input_style, '', hidden_error_style
+
+###############################
+### OLD Search bar callback ###
+###############################
+# @app.callback(
+#     [Output('user-location-store', 'children'),
+#      Output('radius-buttons-container', 'style')]
+#     [Input('search-button', 'n_clicks'),
+#      Input('reset-button', 'n_clicks')],
+#     [State('address-search', 'value')],
+#     prevent_initial_call=True
+# )
+# def handle_location_search(search_clicks, reset_clicks, address):
+#     """Handle address search and show/hide radius buttons"""
+#     from dash import callback_context
+    
+#     # Check which button was clicked
+#     if not callback_context.triggered:
+#         return None
+    
+#     button_id = callback_context.triggered[0]['prop_id'].split('.')[0]
+    
+#     # Reset button clicked
+#     if button_id == 'reset-button':
+#         return None
+    
+#     # Search button clicked
+#     if button_id == 'search-button' and address:
+#         from utils import geocode_address
+#         lat, lon = geocode_address(address)
+        
+#         if lat and lon:
+#             # Store location as JSON
+#             import json
+#             location_data = json.dumps({'lat': lat, 'lon': lon})
+#             # Show radius buttons
+#             return location_data, {'display': 'inline-block', 'marginLeft': '15px'}
+#         else:
+#             print(f"Address not found: {address}")
+#             return None
+    
+#     return None #, {'display': 'none'}
+###############################
+###############################
+###############################
+
+
+# Search radius selection for search bar
+@app.callback(
+    [Output('selected-radius-store', 'children'),
+     Output('radius-2km', 'style'),
+     Output('radius-5km', 'style'),
+     Output('radius-10km', 'style')],
+    [Input('radius-2km', 'n_clicks'),
+     Input('radius-5km', 'n_clicks'),
+     Input('radius-10km', 'n_clicks'),
+     Input('reset-button', 'n_clicks')],
+    prevent_initial_call=True
+)
+def update_selected_radius(clicks_2, clicks_5, clicks_10, reset_clicks):
+    """Update selected radius and button styles"""
+    from dash import callback_context
+    
+    if not callback_context.triggered:
+        return '10', *[base_style]*3
+    
+    button_id = callback_context.triggered[0]['prop_id'].split('.')[0]
+    
+    # Base style for buttons
+    base_style = {
+        'padding': '10px 20px',
+        'backgroundColor': '#555',
+        'color': 'white',
+        'border': 'none',
+        'cursor': 'pointer',
+        'marginLeft': '10px',
+        'borderRadius': '4px',
+        'fontFamily': FONT_FAMILY_REGULAR,
+        'fontSize': '14px'
+    }
+    
+    # Active style
+    active_style = base_style.copy()
+    active_style['backgroundColor'] = COLORS['blue']
+    
+    # Reset clicked
+    if button_id == 'reset-button':
+        return '10', base_style, base_style, base_style
+    
+    # Radius buttons clicked
+    if button_id == 'radius-2km':
+        return '2', active_style, base_style, base_style
+    elif button_id == 'radius-5km':
+        return '5', base_style, active_style, base_style
+    elif button_id == 'radius-10km':
+        return '10', base_style, base_style, active_style
+
+    
+    return '10', base_style, base_style, active_style
+
+
+@app.callback(
+    [Output('address-search', 'style', allow_duplicate=True),
+     Output('search-error-message', 'style', allow_duplicate=True)],
+    Input('address-search', 'value'),
+    prevent_initial_call=True
+)
+def clear_error_on_typing(value):
+    """Clear error styling when user starts typing"""
+    default_style = {
+        'width': '300px',
+        'padding': '10px',
+        'backgroundColor': '#1a1a1a',
+        'color': COLORS['dark_text'],
+        'border': f'1px solid {COLORS["dark_border"]}',
+        'borderRadius': '4px 0 0 4px',
+        'fontFamily': FONT_FAMILY_REGULAR,
+        'fontSize': '14px'
+    }
+    
+    hidden_error_style = {
+        'marginTop': '5px',
+        'color': '#ff4444',
+        'fontSize': '12px',
+        'fontFamily': FONT_FAMILY_REGULAR,
+        'display': 'none'
+    }
+    
+    return default_style, hidden_error_style
+
 
 if __name__ == '__main__':
     # For Google Colab, use mode='inline' or 'external'

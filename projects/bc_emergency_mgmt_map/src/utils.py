@@ -2,12 +2,9 @@ import requests
 import numpy as np
 import pandas as pd
 import geopandas as gpd
-# import plotly.graph_objects as go
 
-# from dash import Dash, dcc, html, Input, Output, State, dash_table
-# from datetime import datetime, timedelta
 from shapely.geometry import shape, Point, Polygon
-# from zoneinfo import ZoneInfo
+from math import radians, cos, sin, asin, sqrt
 
 
 
@@ -180,3 +177,83 @@ def check_sites_in_emergencies(sites_df, poly_geodf):
     sites_in_emergency = sites_in_emergency.drop(columns=['geometry', 'index_right'], errors='ignore')
 
     return sites_in_emergency
+
+
+def geocode_address(address):
+    """Geocode address using OpenStreetMap Nominatim"""
+    try:
+        url = "https://nominatim.openstreetmap.org/search"
+        params = {
+            'q': address,
+            'format': 'json',
+            'limit': 1
+        }
+        headers = {
+            'User-Agent': 'BC-Emergency-Dashboard/1.0'
+        }
+        
+        response = requests.get(url, params=params, headers=headers)
+        
+        if response.status_code == 200:
+            results = response.json()
+            if results:
+                latitude = float(results[0]['lat'])
+                longitude = float(results[0]['lon'])
+                return latitude, longitude 
+            
+        return None, None
+    
+    except Exception as e:
+        print(f"Geocoding error: {e}")
+        return None, None
+
+
+def haversine_distance(lat1, lon1, lat2, lon2):
+    """Calculate distance between two points in km"""
+    # Convert to radians
+    lat1, lon1, lat2, lon2 = map(radians, [lat1, lon1, lat2, lon2])
+    
+    # Haversine formula
+    dlat = lat2 - lat1
+    dlon = lon2 - lon1
+    a = sin(dlat/2)**2 + cos(lat1) * cos(lat2) * sin(dlon/2)**2
+    c = 2 * asin(sqrt(a))
+    km = 6371 * c  # Radius of Earth in km
+    
+    return km
+
+
+def generate_search_suggestion(failed_address):
+    """Generate helpful search suggestion based on failed input"""
+    
+    # Check what user entered
+    has_numbers = any(char.isdigit() for char in failed_address)
+    has_comma = ',' in failed_address
+    is_short = len(failed_address.strip()) < 5
+    
+    # Generate context-aware suggestion
+    if is_short:
+        return '❌ Address too short. Try: "Vancouver, BC" or "123 Main St, Victoria"'
+    
+    elif not has_numbers and not has_comma:
+        # Likely just a street name or city
+        return f'❌ No results found. Try: "{failed_address}, Vancouver, BC"'
+    
+    elif has_numbers and not has_comma:
+        # Has street number but no city
+        return f'❌ No results found. Try: "{failed_address}, BC"'
+    
+    elif has_comma:
+        # Well-formatted but still failed - might be typo or non-existent
+        suggestions = [
+            '"123 Main St, Vancouver, BC"',
+            '"Victoria, BC"',
+            '"V6B 1A1"'  # Postal code example
+        ]
+        import random
+        suggestion = random.choice(suggestions)
+        return f'❌ Address not found. Try being more specific like: {suggestion}'
+    
+    else:
+        # Generic fallback
+        return '❌ No results found. Try: "City, BC" or "123 Street Name, City, BC"'
