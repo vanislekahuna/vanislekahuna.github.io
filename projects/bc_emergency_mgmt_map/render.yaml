@@ -9,3 +9,8 @@ services:
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.0
+    outboundNetwork:
+      allowedDomains:
+        - nominatim.openstreetmap.org
+        - raw.githubusercontent.com
+        - services6.arcgis.com
