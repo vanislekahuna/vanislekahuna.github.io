@@ -8,6 +8,7 @@ import plotly.graph_objects as go
 
 from dash import Dash, dcc, html, Input, Output, State, dash_table
 from datetime import datetime, timedelta
+from io import StringIO
 from shapely.geometry import shape, Point, Polygon
 from zoneinfo import ZoneInfo
 from utils import *
@@ -324,7 +325,6 @@ app.layout = html.Div([
                     'height': '34px',
                     'width': '34px',
                     'filter': 'brightness(0) saturate(100%) invert(70%) sepia(85%) saturate(445%) hue-rotate(61deg) brightness(101%) contrast(101%)'
-                    # 'filter': 'invert(1)'  # Makes it white if the icon is black
                 }
             ),
             id='reset-button',
@@ -476,8 +476,8 @@ app.layout = html.Div([
                     'borderRadius': '0 4px 4px 0',
                     'fontSize': '16px',
                     'marginLeft': '-1px',
-                    'height': '38px',               # ADD - matches dropdown height
-                    'verticalAlign': 'top'          # ADD - aligns with dropdown
+                    'height': '38px',               
+                    'verticalAlign': 'top'          
                 }
             ),
             html.Div(
@@ -689,7 +689,7 @@ def update_filter_options(selected_city, sites_json, poly_json):
     # Load data -- CLAUDE FIX
     if sites_json and poly_json:
         import json
-        sites_data = pd.read_json(sites_json)
+        sites_data = pd.read_json(StringIO(sites_json))
         poly_data = gpd.GeoDataFrame.from_features(json.loads(poly_json))  # <-- BETTER FIX
     else:
         sites_data = sites_with_events
@@ -736,7 +736,7 @@ def update_map_and_table(city_filter, event_type_filter, event_name_filter,
     # Load data
     if sites_json and poly_json:
         import json
-        sites_data = pd.read_json(sites_json)
+        sites_data = pd.read_json(StringIO(sites_json))
         poly_data = gpd.GeoDataFrame.from_features(json.loads(poly_json))  # <-- BETTER FIX
     else:
         sites_data = sites_with_events
@@ -1063,7 +1063,7 @@ def update_metric_cards(city_filter, event_type_filter, event_name_filter,
     # Load data (same logic as update_map_and_table)
     if sites_json and poly_json:
         import json
-        sites_data = pd.read_json(sites_json)
+        sites_data = pd.read_json(StringIO(sites_json))
     else:
         sites_data = sites_with_events.copy()
     
@@ -1195,51 +1195,6 @@ def handle_location_search(search_clicks, reset_clicks, address):
             return None, error_input_style, error_msg, visible_error_style
     
     return None, default_input_style, '', hidden_error_style
-
-###############################
-### OLD Search bar callback ###
-###############################
-# @app.callback(
-#     [Output('user-location-store', 'children'),
-#      Output('radius-buttons-container', 'style')]
-#     [Input('search-button', 'n_clicks'),
-#      Input('reset-button', 'n_clicks')],
-#     [State('address-search', 'value')],
-#     prevent_initial_call=True
-# )
-# def handle_location_search(search_clicks, reset_clicks, address):
-#     """Handle address search and show/hide radius buttons"""
-#     from dash import callback_context
-    
-#     # Check which button was clicked
-#     if not callback_context.triggered:
-#         return None
-    
-#     button_id = callback_context.triggered[0]['prop_id'].split('.')[0]
-    
-#     # Reset button clicked
-#     if button_id == 'reset-button':
-#         return None
-    
-#     # Search button clicked
-#     if button_id == 'search-button' and address:
-#         from utils import geocode_address
-#         lat, lon = geocode_address(address)
-        
-#         if lat and lon:
-#             # Store location as JSON
-#             import json
-#             location_data = json.dumps({'lat': lat, 'lon': lon})
-#             # Show radius buttons
-#             return location_data, {'display': 'inline-block', 'marginLeft': '15px'}
-#         else:
-#             print(f"Address not found: {address}")
-#             return None
-    
-#     return None #, {'display': 'none'}
-###############################
-###############################
-###############################
 
 
 # Search radius selection for search bar
