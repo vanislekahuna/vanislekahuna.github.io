@@ -1,5 +1,6 @@
 import logging
 import requests
+import os
 import sys
 import numpy as np
 import pandas as pd
@@ -7,6 +8,8 @@ import geopandas as gpd
 
 from shapely.geometry import shape, Point, Polygon
 from math import radians, cos, sin, asin, sqrt
+from rate_limiter import get_rate_limiter
+from geocode_cache import get_cache
 
 # Force immediate output to stderr (works better on Render)
 logging.basicConfig(
@@ -187,42 +190,6 @@ def check_sites_in_emergencies(sites_df, poly_geodf):
     return sites_in_emergency
 
 
-def geocode_address(address):
-    """Geocode address using OpenStreetMap Nominatim"""
-    try:
-        url = "https://nominatim.openstreetmap.org/search"
-        params = {
-            'q': address,
-            'format': 'json',
-            'limit': 1,
-            'countrycodes': 'ca' # Adding this to try to restricts to Canada, speeds up search
-        }
-        headers = {
-            'User-Agent': 'BC-Emergency-Dashboard/1.0'
-        }
-
-        logger.info(f"[GEOCODE] Sending request to {url}")
-        
-        response = requests.get(url, params=params, headers=headers, timeout=5)
-
-        logger.info(f"[GEOCODE] Response status: {response.status_code}")
-        logger.info(f"[GEOCODE] Response time: {response.elapsed.total_seconds()}s")
-        
-        if response.status_code == 200:
-            results = response.json()
-            logger.info(f"[GEOCODE] Found {len(results)} results")
-            if results:
-                latitude = float(results[0]['lat'])
-                longitude = float(results[0]['lon'])
-                return latitude, longitude 
-
-        logger.info(f"[GEOCODE] No results found for address")
-        return None, None
-    
-    except Exception as e:
-        logger.info(f"Geocoding error: {e}")
-        return None, None
-
 
 def haversine_distance(lat1, lon1, lat2, lon2):
     """Calculate distance between two points in km"""
@@ -273,3 +240,128 @@ def generate_search_suggestion(failed_address):
     else:
         # Generic fallback
         return '❌ No results found. Try: "City, BC" or "123 Street Name, City, BC"'
+    
+
+# def geocode_address(address):
+#     """Geocode address using OpenStreetMap Nominatim"""
+#     try:
+#         url = "https://nominatim.openstreetmap.org/search"
+#         params = {
+#             'q': address,
+#             'format': 'json',
+#             'limit': 1,
+#             'countrycodes': 'ca' # Adding this to try to restricts to Canada, speeds up search
+#         }
+#         headers = {
+#             'User-Agent': 'BC-Emergency-Dashboard/1.0'
+#         }
+
+#         logger.info(f"[GEOCODE] Sending request to {url}")
+        
+#         response = requests.get(url, params=params, headers=headers, timeout=5)
+
+#         logger.info(f"[GEOCODE] Response status: {response.status_code}")
+#         logger.info(f"[GEOCODE] Response time: {response.elapsed.total_seconds()}s")
+        
+#         if response.status_code == 200:
+#             results = response.json()
+#             logger.info(f"[GEOCODE] Found {len(results)} results")
+#             if results:
+#                 latitude = float(results[0]['lat'])
+#                 longitude = float(results[0]['lon'])
+#                 return latitude, longitude 
+
+#         logger.info(f"[GEOCODE] No results found for address")
+#         return None, None
+    
+    # except Exception as e:
+    #     logger.info(f"Geocoding error: {e}")
+    #     return None, None
+
+
+def geocode_address(address):
+    """
+    Geocode address using Google Maps with rate limiting and caching
+    
+    Safety features:
+    - Caches results for 30 days (no duplicate API calls)
+    - Rate limited to 10 req/sec, 500 req/day
+    - Monthly budget cap of $50 (well under $200 free tier)
+    - Detailed logging and cost tracking
+    """
+    
+    # Check cache first
+    cache = get_cache()
+    cached_lat, cached_lon = cache.get(address)
+    if cached_lat and cached_lon:
+        return cached_lat, cached_lon
+    
+    # Get API key
+    api_key = os.environ.get('geocoder_key')
+    
+    if not api_key:
+        logger.error("[GEOCODE] geocoder_key not set in environment")
+        return None, None
+    
+    # Check rate limiter
+    limiter = get_rate_limiter()
+    
+    if not limiter.can_make_request():
+        stats = limiter.get_stats()
+        logger.error(f"[GEOCODE] RATE LIMIT EXCEEDED - Daily: {stats['daily_requests']}/{limiter.requests_per_day}, Cost: ${stats['monthly_cost']:.2f}")
+        return None, None
+    
+    try:
+        logger.info(f"[GEOCODE] API REQUEST for: {address}")
+        
+        url = "https://maps.googleapis.com/maps/api/geocode/json"
+        params = {
+            'address': address,
+            'key': api_key,
+            'region': 'ca'
+        }
+        
+        response = requests.get(url, params=params, timeout=5)
+        
+        # Record request (for rate limiting)
+        limiter.record_request()
+        
+        # Log stats
+        stats = limiter.get_stats()
+        logger.info(f"[GEOCODE] Status: {response.status_code} | Daily: {stats['daily_requests']} | Cost: ${stats['monthly_cost']:.2f}")
+        
+        if response.status_code == 200:
+            data = response.json()
+            
+            if data['status'] == 'OK' and data['results']:
+                location = data['results'][0]['geometry']['location']
+                lat = location['lat']
+                lon = location['lng']
+                
+                # Cache the result
+                cache.set(address, lat, lon)
+                
+                logger.info(f"[GEOCODE] SUCCESS - Lat: {lat}, Lon: {lon}")
+                return lat, lon
+            
+            elif data['status'] == 'OVER_QUERY_LIMIT':
+                logger.error("[GEOCODE] OVER_QUERY_LIMIT - Google API quota exceeded!")
+                return None, None
+            
+            else:
+                logger.warning(f"[GEOCODE] No results: {data['status']}")
+        
+        else:
+            logger.error(f"[GEOCODE] HTTP {response.status_code}: {response.text[:200]}")
+        
+        return None, None
+    
+    except requests.Timeout:
+        logger.error("[GEOCODE] TIMEOUT after 5 seconds")
+        return None, None
+    
+    except Exception as e:
+        logger.error(f"[GEOCODE] ERROR: {type(e).__name__} - {str(e)}")
+        import traceback
+        logger.error(traceback.format_exc())
+        return None, None
