@@ -186,21 +186,29 @@ def geocode_address(address):
         params = {
             'q': address,
             'format': 'json',
-            'limit': 1
+            'limit': 1,
+            'countrycodes': 'ca' # Adding this to try to restricts to Canada, speeds up search
         }
         headers = {
             'User-Agent': 'BC-Emergency-Dashboard/1.0'
         }
+
+        print(f"[GEOCODE] Sending request to {url}")
         
-        response = requests.get(url, params=params, headers=headers)
+        response = requests.get(url, params=params, headers=headers, timeout=5)
+
+        print(f"[GEOCODE] Response status: {response.status_code}")
+        print(f"[GEOCODE] Response time: {response.elapsed.total_seconds()}s")
         
         if response.status_code == 200:
             results = response.json()
+            print(f"[GEOCODE] Found {len(results)} results")
             if results:
                 latitude = float(results[0]['lat'])
                 longitude = float(results[0]['lon'])
                 return latitude, longitude 
-            
+
+        print(f"[GEOCODE] No results found for address")
         return None, None
     
     except Exception as e:

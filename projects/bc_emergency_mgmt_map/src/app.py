@@ -6,7 +6,7 @@ import pandas as pd
 import geopandas as gpd
 import plotly.graph_objects as go
 
-from dash import Dash, dcc, html, Input, Output, State, dash_table
+from dash import Dash, dcc, html, Input, Output, State, dash_table, callback_context
 from datetime import datetime, timedelta
 from io import StringIO
 from shapely.geometry import shape, Point, Polygon
@@ -1062,7 +1062,6 @@ def update_metric_cards(city_filter, event_type_filter, event_name_filter,
     
     # Load data (same logic as update_map_and_table)
     if sites_json and poly_json:
-        import json
         sites_data = pd.read_json(StringIO(sites_json))
     else:
         sites_data = sites_with_events.copy()
@@ -1074,7 +1073,6 @@ def update_metric_cards(city_filter, event_type_filter, event_name_filter,
     user_lat, user_lon = None, None
     if user_location_json:
         try:
-            import json
             location_data = json.loads(user_location_json)
             user_lat = location_data['lat']
             user_lon = location_data['lon']
@@ -1138,7 +1136,6 @@ def update_metric_cards(city_filter, event_type_filter, event_name_filter,
 def handle_location_search(search_clicks, reset_clicks, address):
     """Handle address search with error feedback"""
     from dash import callback_context
-    import json
     
     # Default styles
     default_input_style = {
@@ -1182,7 +1179,6 @@ def handle_location_search(search_clicks, reset_clicks, address):
             error_msg = '⚠️ Please enter an address to search.'
             return None, error_input_style, error_msg, visible_error_style
         
-        # from utils import geocode_address
         lat, lon = geocode_address(address)
         
         if lat and lon:
@@ -1211,7 +1207,6 @@ def handle_location_search(search_clicks, reset_clicks, address):
 )
 def update_selected_radius(clicks_2, clicks_5, clicks_10, reset_clicks):
     """Update selected radius and button styles"""
-    from dash import callback_context
     
     if not callback_context.triggered:
         return '10', *[base_style]*3
