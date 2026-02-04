@@ -1,4 +1,6 @@
+import logging
 import requests
+import sys
 import numpy as np
 import pandas as pd
 import geopandas as gpd
@@ -6,7 +8,13 @@ import geopandas as gpd
 from shapely.geometry import shape, Point, Polygon
 from math import radians, cos, sin, asin, sqrt
 
-
+# Force immediate output to stderr (works better on Render)
+logging.basicConfig(
+    level=logging.INFO,
+    format='[%(levelname)s] %(message)s',
+    stream=sys.stderr  # Send to stderr instead of stdout
+)
+logger = logging.getLogger(__name__)
 
 def bc_alerts_api():
     """Retrieves the data from fake the B.C. Emergency Orders and Alerts API"""
@@ -193,26 +201,26 @@ def geocode_address(address):
             'User-Agent': 'BC-Emergency-Dashboard/1.0'
         }
 
-        print(f"[GEOCODE] Sending request to {url}")
+        logger.info(f"[GEOCODE] Sending request to {url}")
         
         response = requests.get(url, params=params, headers=headers, timeout=5)
 
-        print(f"[GEOCODE] Response status: {response.status_code}")
-        print(f"[GEOCODE] Response time: {response.elapsed.total_seconds()}s")
+        logger.info(f"[GEOCODE] Response status: {response.status_code}")
+        logger.info(f"[GEOCODE] Response time: {response.elapsed.total_seconds()}s")
         
         if response.status_code == 200:
             results = response.json()
-            print(f"[GEOCODE] Found {len(results)} results")
+            logger.info(f"[GEOCODE] Found {len(results)} results")
             if results:
                 latitude = float(results[0]['lat'])
                 longitude = float(results[0]['lon'])
                 return latitude, longitude 
 
-        print(f"[GEOCODE] No results found for address")
+        logger.info(f"[GEOCODE] No results found for address")
         return None, None
     
     except Exception as e:
-        print(f"Geocoding error: {e}")
+        logger.info(f"Geocoding error: {e}")
         return None, None
 
 
