@@ -214,7 +214,8 @@ app.layout = html.Div([
             html.Div(
                 [
                     html.Label(
-                        'Show only affected sites: ',
+                        # 'Show only affected sites: ',
+                        'Display evacuation zones: ',
                         style={
                             'margin-right': '10px',
                             'fontFamily': FONT_FAMILY,
@@ -421,23 +422,29 @@ app.layout = html.Div([
 
     # Map
     html.Div([
-        dcc.Graph(
-            id='emergency-map',
-            style={
-                'height': '500px', 
-                'backgroundColor': 
-                COLORS['dark_bg'],
-                'marginLeft': '20px',
-                'marginRight': '20px',
-            },
-            config={
-                'scrollZoom': True,
-                'displayModeBar': True,
-                'responsive': True,  # Add this
-                'doubleClick': 'reset+autosize'
-            }
-        ),
-    ], style={
+    dcc.Loading(
+        id="loading-map",
+        type="circle",  # Options: "circle", "default", "dot", "cube"
+        color="#00aeff",  # Match your blue accent color
+        children=[
+            dcc.Graph(
+                id='emergency-map',
+                style={
+                    'height': '500px', 
+                    'backgroundColor': 
+                    COLORS['dark_bg'],
+                    'marginLeft': '20px',
+                    'marginRight': '20px',
+                },
+                config={
+                    'scrollZoom': True,
+                    'displayModeBar': True,
+                    'responsive': True,  # Add this
+                    'doubleClick': 'reset+autosize'
+                }
+            )
+        ]
+    )], style={
         'backgroundColor': COLORS['dark_bg'],
         'height': '540px',  # Fixed container height (map + padding)
         'overflow': 'hidden'  # Prevent overflow
@@ -566,50 +573,57 @@ app.layout = html.Div([
                 'marginBottom': '15px'
             }
         ),
-        dash_table.DataTable(
-            id='sites-table',
-            columns=[
-                {'name': 'Site Name', 'id': 'site_name'},
-                {'name': 'City', 'id': 'city'},
-                {'name': 'Contact Phone', 'id': 'phone'},
-                {'name': 'Max Capacity', 'id': 'max_capacity'},
-                {'name': 'Event Type', 'id': 'event_type'},
-            ],
-            style_table={
-                'overflowX': 'auto',
-                'overflowY': 'auto',
-                'maxHeight': '400px',
-                'backgroundColor': COLORS['dark_bg']
-            },
-            style_cell={
-                'textAlign': 'left',
-                'padding': '10px',
-                'backgroundColor': '#1a1a1a',
-                'color': COLORS['dark_text'],
-                'border': f'1px solid {COLORS["dark_border"]}',
-                'fontFamily': FONT_FAMILY_REGULAR
-            },
-            style_header={
-                'backgroundColor': '#2d2d2d',
-                'fontWeight': 'bold',
-                'color': COLORS['dark_text'],
-                'border': f'1px solid {COLORS["dark_border"]}',
-                'fontFamily': FONT_FAMILY,
-                'fontSize': '14px'
-            },
-            style_data_conditional=[
-                {
-                    'if': {'filter_query': '{event_type} != ""'},
-                    'backgroundColor': '#3d2a1f',
-                    'color': COLORS['lycanroc']
-                },
-                {
-                    'if': {'state': 'active'},
-                    'backgroundColor': '#0a2540',
-                    'border': f'1px solid {COLORS["blue"]}'
-                }
-            ],
-            page_size=15
+        dcc.Loading(
+            id="loading-table",
+            type="default",  # Smaller spinner for table
+            color="#00aeff",
+            children=[
+                dash_table.DataTable(
+                    id='sites-table',
+                    columns=[
+                        {'name': 'Site Name', 'id': 'site_name'},
+                        {'name': 'City', 'id': 'city'},
+                        {'name': 'Contact Phone', 'id': 'phone'},
+                        {'name': 'Max Capacity', 'id': 'max_capacity'},
+                        {'name': 'Event Type', 'id': 'event_type'},
+                    ],
+                    style_table={
+                        'overflowX': 'auto',
+                        'overflowY': 'auto',
+                        'maxHeight': '400px',
+                        'backgroundColor': COLORS['dark_bg']
+                    },
+                    style_cell={
+                        'textAlign': 'left',
+                        'padding': '10px',
+                        'backgroundColor': '#1a1a1a',
+                        'color': COLORS['dark_text'],
+                        'border': f'1px solid {COLORS["dark_border"]}',
+                        'fontFamily': FONT_FAMILY_REGULAR
+                    },
+                    style_header={
+                        'backgroundColor': '#2d2d2d',
+                        'fontWeight': 'bold',
+                        'color': COLORS['dark_text'],
+                        'border': f'1px solid {COLORS["dark_border"]}',
+                        'fontFamily': FONT_FAMILY,
+                        'fontSize': '14px'
+                    },
+                    style_data_conditional=[
+                        {
+                            'if': {'filter_query': '{event_type} != ""'},
+                            'backgroundColor': '#3d2a1f',
+                            'color': COLORS['lycanroc']
+                        },
+                        {
+                            'if': {'state': 'active'},
+                            'backgroundColor': '#0a2540',
+                            'border': f'1px solid {COLORS["blue"]}'
+                        }
+                    ],
+                    page_size=15
+                )
+            ]
         )
     ], style={
         'padding': '20px',
@@ -886,6 +900,16 @@ def update_map_and_table(city_filter, event_type_filter, event_name_filter,
 
     # Add affected sites (red markers)
     if len(affected_sites) > 0:
+        # Adding the black outline
+        fig.add_trace(go.Scattermapbox(
+            lon=affected_sites['lon'],
+            lat=affected_sites['lat'],
+            mode='markers',
+            marker=dict(size=10, color='black', opacity=0.5),
+            name='Affected Sites Line',
+            showlegend=False
+        ))
+
         fig.add_trace(
             go.Scattermapbox(
                 lon=affected_sites['lon'],
@@ -905,8 +929,18 @@ def update_map_and_table(city_filter, event_type_filter, event_name_filter,
             )
         )
 
-    # Add unaffected sites (cyan markers)
+    # Add unaffected sites (green markers)
     if len(unaffected_sites) > 0:
+        # Adding the black outline
+        fig.add_trace(go.Scattermapbox(
+            lon=unaffected_sites['lon'],
+            lat=unaffected_sites['lat'],
+            mode='markers',
+            marker=dict(size=10, color='black', opacity=0.5),
+            name='Affected Sites Line',
+            showlegend=False
+        ))
+
         fig.add_trace(
             go.Scattermapbox(
                 lon=unaffected_sites['lon'],
