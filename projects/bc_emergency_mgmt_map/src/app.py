@@ -587,6 +587,8 @@ app.layout = html.Div([
                         {'name': 'Max Capacity', 'id': 'max_capacity'},
                         {'name': 'Event Type', 'id': 'event_type'},
                     ],
+                    row_selectable='single',  # Allow single row selection
+                    selected_rows=[],  # Initially no rows selected
                     style_table={
                         'overflowX': 'auto',
                         'overflowY': 'auto',
@@ -619,6 +621,12 @@ app.layout = html.Div([
                             'if': {'state': 'active'},
                             'backgroundColor': '#0a2540',
                             'border': f'1px solid {COLORS["blue"]}'
+                        },
+                        {
+                            'if': {'state': 'selected'},
+                            'backgroundColor': '#1a4d7a',
+                            'color': '#ffffff',
+                            'border': f'2px solid {COLORS["blue"]}'
                         }
                     ],
                     page_size=15
@@ -654,7 +662,8 @@ app.layout = html.Div([
 
     # Hidden div to store data
     html.Div(id='emergency-data-store', style={'display': 'none'}),
-    html.Div(id='sites-data-store', style={'display': 'none'})
+    html.Div(id='sites-data-store', style={'display': 'none'}),
+    html.Div(id='selected-site-store', style={'display': 'none'}),
 ], 
 style={
     'backgroundColor': COLORS['dark_bg'],
@@ -732,19 +741,21 @@ def update_filter_options(selected_city, sites_json, poly_json):
 # Filter affecting map and table callback
 @app.callback(
     [Output('emergency-map', 'figure'),
-     Output('sites-table', 'data')],
+     Output('sites-table', 'data'),
+     Output('sites-table', 'selected_rows')],
     [Input('city-filter', 'value'),
      Input('event-type-filter', 'value'),
      Input('event-name-filter', 'value'),
      Input('affected-toggle', 'value'),
      Input('sites-data-store', 'children'),
      Input('emergency-data-store', 'children'),
-     Input('user-location-store', 'children'),  # NEW
-     Input('selected-radius-store', 'children')]  # NEW
+     Input('user-location-store', 'children'),
+     Input('selected-radius-store', 'children'),
+     Input('selected-site-store', 'children')]
 )
 
 def update_map_and_table(city_filter, event_type_filter, event_name_filter,
-                        affected_toggle, sites_json, poly_json, user_location_json, selected_radius):
+                        affected_toggle, sites_json, poly_json, user_location_json, selected_radius, selected_site_json):
     """Update map and table based on filters"""
 
     # Load data
@@ -960,6 +971,49 @@ def update_map_and_table(city_filter, event_type_filter, event_name_filter,
             )
         )
 
+        # Highlight selected site (if any)
+        selected_site_info = None
+        if selected_site_json:
+            try:
+                import json
+                selected_site_info = json.loads(selected_site_json)
+            except:
+                pass
+
+        if selected_site_info:
+            # Find the selected site in filtered data
+            selected_mask = (
+                (filtered_sites['site_name'] == selected_site_info['name']) &
+                (filtered_sites['city'] == selected_site_info['city'])
+            )
+            selected_site_data = filtered_sites[selected_mask]
+            
+            if len(selected_site_data) > 0:
+                # Add highlighted marker
+                fig.add_trace(
+                    go.Scattermapbox(
+                        lon=selected_site_data['lon'],
+                        lat=selected_site_data['lat'],
+                        mode='markers',
+                        marker=dict(
+                            size=20,  # Larger than normal
+                            color='#FFD700',  # Gold color
+                            opacity=1.0
+                        ),
+                        name='Selected Site',
+                        hoverinfo='text',
+                        hovertext=[
+                            f"<b>🔍 SELECTED: {row['site_name']}</b><br>"
+                            f"City: {row['city']}<br>"
+                            f"Capacity: {row['max_capacity']}<br>"
+                            f"Status: {'⚠️ Affected by ' + row['event_type'] if pd.notna(row['event_type']) else 'Not affected'}"
+                            for _, row in selected_site_data.iterrows()
+                        ],
+                        showlegend=True
+                    )
+                )
+                logger.info(f"Highlighted selected site on map: {selected_site_info['name']}")
+
     # Adding automatic zoom calculations
     # Calculate map center and zoom based on filtered sites
     is_default_view = (city_filter == 'all' and 
@@ -1019,6 +1073,14 @@ def update_map_and_table(city_filter, event_type_filter, event_name_filter,
         center_lon = -123.15151571413801
         zoom_level = 8
 
+    # Auto-zoom to selected site (optional)
+    if selected_site_info and len(selected_site_data) > 0:
+        selected_lat = selected_site_data.iloc[0]['lat']
+        selected_lon = selected_site_data.iloc[0]['lon']
+        center_lat = selected_lat
+        center_lon = selected_lon
+        zoom_level = 13  # Close zoom on selected site
+
     # Brand new update layout with dark mode
     fig.update_layout(
         mapbox=dict(
@@ -1058,7 +1120,81 @@ def update_map_and_table(city_filter, event_type_filter, event_name_filter,
     # Prepare table data
     table_data = filtered_sites[['site_name', 'city', 'max_capacity', 'event_type']].fillna('').to_dict('records') # Removed 'phone', 
 
-    return fig, table_data
+    # Determine which row should be selected (if any)
+    selected_row_idx = []
+    if selected_site_info and selected_site_info.get('source') == 'map':
+        # Find row index in filtered data
+        for idx, row in enumerate(table_data):
+            if (row['site_name'] == selected_site_info['name'] and 
+                row['city'] == selected_site_info['city']):
+                selected_row_idx = [idx]
+                logger.info(f"Auto-selecting table row {idx} based on map click")
+                break
+
+    return fig, table_data, selected_row_idx
+
+
+# Handle Table Row Selection Callback
+@app.callback(
+    Output('selected-site-store', 'children'),
+    [Input('sites-table', 'selected_rows'),
+     Input('emergency-map', 'clickData')],
+    [State('sites-table', 'data'),
+     State('selected-site-store', 'children')]
+)
+    
+def handle_selection(selected_rows, click_data, table_data, current_selection):
+    """
+    Handle bidirectional selection between table and map.
+    Stores selected site info (name + city as unique identifier).
+    """
+
+    if not callback_context.triggered:
+        return None
+
+    trigger_id = callback_context.triggered[0]['prop_id'].split('.')[0]
+
+    # Table row was clicked
+    if trigger_id == 'sites-table' and selected_rows:
+        row_idx = selected_rows[0]
+        if row_idx < len(table_data):
+            selected_site = table_data[row_idx]
+            site_info = {
+                'name': selected_site.get('site_name', ''),
+                'city': selected_site.get('city', ''),
+                'source': 'table'
+            }
+            logger.info(f"Table selection: {site_info['name']} ({site_info['city']})")
+            return json.dumps(site_info)
+
+    # Map marker was clicked
+    elif trigger_id == 'emergency-map' and click_data:
+        # Check if click was on a site marker (not polygon or circle)
+        if 'points' in click_data and len(click_data['points']) > 0:
+            point = click_data['points'][0]
+            
+            # Get hover text which contains site info
+            hover_text = point.get('hovertext', '')
+            
+            # Parse site name and city from hover text
+            # Format: "<b>Site Name</b><br>City: City Name<br>..."
+            if '<b>' in hover_text and 'City:' in hover_text:
+                import re
+                name_match = re.search(r'<b>(.*?)</b>', hover_text)
+                city_match = re.search(r'City: (.*?)<br>', hover_text)
+                
+                if name_match and city_match:
+                    site_info = {
+                        'name': name_match.group(1),
+                        'city': city_match.group(1),
+                        'lat': point.get('lat'),
+                        'lon': point.get('lon'),
+                        'source': 'map'
+                    }
+                    logger.info(f"Map selection: {site_info['name']} ({site_info['city']})")
+                    return json.dumps(site_info)
+
+    return current_selection
 
 
 # Reset Filters Callback
@@ -1067,13 +1203,15 @@ def update_map_and_table(city_filter, event_type_filter, event_name_filter,
      Output('event-type-filter', 'value'),
      Output('event-name-filter', 'value'),
      Output('affected-toggle', 'value'),
-     Output('address-search', 'value')],  # NEW - clear search box
+     Output('address-search', 'value'),
+     Output('selected-site-store', 'children', allow_duplicate=True)],
     Input('reset-button', 'n_clicks'),
     prevent_initial_call=True
 )
+
 def reset_filters(n_clicks):
     """Reset all filters to default values"""
-    return 'all', 'all', 'all', [], ''
+    return 'all', 'all', 'all', [], '', None
 
 
 # Update metric cards callback
@@ -1089,6 +1227,7 @@ def reset_filters(n_clicks):
      Input('user-location-store', 'children'),  # NEW
      Input('selected-radius-store', 'children')]  # NEW
 )
+
 def update_metric_cards(city_filter, event_type_filter, event_name_filter,
                        affected_toggle, sites_json, poly_json,
                        user_location_json, selected_radius): # ADDED PARAMETERS
@@ -1167,6 +1306,7 @@ def update_metric_cards(city_filter, event_type_filter, event_name_filter,
     [State('address-search', 'value')],
     prevent_initial_call=True
 )
+
 def handle_location_search(search_clicks, reset_clicks, address):
     """Handle address search with error feedback"""
     from dash import callback_context
@@ -1239,6 +1379,7 @@ def handle_location_search(search_clicks, reset_clicks, address):
      Input('reset-button', 'n_clicks')],
     prevent_initial_call=True
 )
+
 def update_selected_radius(clicks_2, clicks_5, clicks_10, reset_clicks):
     """Update selected radius and button styles"""
     
@@ -1286,6 +1427,7 @@ def update_selected_radius(clicks_2, clicks_5, clicks_10, reset_clicks):
     Input('address-search', 'value'),
     prevent_initial_call=True
 )
+
 def clear_error_on_typing(value):
     """Clear error styling when user starts typing"""
     default_style = {
