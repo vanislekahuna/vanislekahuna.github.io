@@ -257,7 +257,7 @@ app.layout = html.Div([
             dcc.Dropdown(
                 id='city-filter',
                 options=[{'label': 'All Cities', 'value': 'all'}] +
-                        [{'label': city, 'value': city} for city in sorted(sites_df['city'].unique())],
+                        [{'label': city, 'value': city} for city in sorted(sites_df['city'].dropna().unique())],
                 value='all',
                 clearable=False,
                 style={
@@ -700,7 +700,6 @@ def refresh_emergency_data(n_clicks):
 def update_filter_options(selected_city, sites_json, poly_json):
     """Update filter options based on selected city"""
 
-    # Load data -- CLAUDE FIX
     if sites_json and poly_json:
         import json
         sites_data = pd.read_json(StringIO(sites_json))

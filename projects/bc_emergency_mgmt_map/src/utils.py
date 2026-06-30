@@ -141,7 +141,8 @@ def bc_alerts_api():
 def retrieve_site_data():
     """Retrieve the geocoordinates of our sites assets"""
 
-    synth_link = "https://raw.githubusercontent.com/vanislekahuna/bc-cc-maps/refs/heads/main/data/synth_data.csv"
+    # synth_link = "https://raw.githubusercontent.com/vanislekahuna/bc-cc-maps/refs/heads/main/data/synth_data.csv"
+    synth_link = "https://raw.githubusercontent.com/vanislekahuna/bc-cc-maps/refs/heads/main/data/combined_facilities.csv"
     col_renames = {
         "facility_name": "site_name",
         "latitude": "lat",
