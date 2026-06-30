@@ -726,9 +726,9 @@ def update_filter_options(selected_city, sites_json, poly_json):
         # event_names = [{'label': 'All Events', 'value': 'all'}]
 
     if len(filtered_sites) > 0:
-        facility_types = [{'label': 'All Property Types', 'value': 'all'}] + [{'label': pt, 'value': pt} for pt in sorted(filtered_sites['property_type'].dropna().unique())]
+        facility_types = [{'label': 'All Facility Types', 'value': 'all'}] + [{'label': pt, 'value': pt} for pt in sorted(filtered_sites['property_type'].dropna().unique())]
     else:
-        facility_types = [{'label': 'All Property Types', 'value': 'all'}]
+        facility_types = [{'label': 'All Facility Types', 'value': 'all'}]
 
     return event_types, facility_types
 
@@ -839,9 +839,9 @@ def update_map_and_table(city_filter, event_type_filter, facility_type_filter,
                           color=EVENT_LINE_COLORS.get(row['event_type'], 'gray'),
                           width=3
                       ),
-                      name=f"ID: {row['event_id']} | {row['property_type']} ({row['event_type']})",
+                      name=f"ID: {row['event_id']} | {row['event_name']} ({row['event_type']})",
                       hoverinfo='text',
-                      hovertext=f"<b>{row['property_type']}</b> (Part {row['part_num']} of {row['total_parts']})<br>Type: {row['event_type']}<br>ID: {row['event_id']}",
+                      hovertext=f"<b>{row['event_name']}</b> (Part {row['part_num']} of {row['total_parts']})<br>Type: {row['event_type']}<br>ID: {row['event_id']}",
                       showlegend=False
                   )
                 )
