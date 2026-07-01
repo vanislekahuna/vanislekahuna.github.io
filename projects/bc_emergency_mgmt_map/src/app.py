@@ -296,7 +296,7 @@ app.layout = html.Div([
 
         html.Div([
             html.Label(
-                'Event Name:',
+                'Facility Type:',
                 style={
                     'fontFamily': FONT_FAMILY,
                     'fontWeight': 'bold',
@@ -306,8 +306,8 @@ app.layout = html.Div([
                 }
             ),
             dcc.Dropdown(
-                id='event-name-filter',
-                options=[{'label': 'All Events', 'value': 'all'}],
+                id='facility-type-filter',
+                options=[{'label': 'All Facility Types', 'value': 'all'}],
                 value='all',
                 clearable=False,
                 style={
@@ -321,7 +321,7 @@ app.layout = html.Div([
 
         html.Button(
             html.Img(
-                src='https://raw.githubusercontent.com/vanislekahuna/vanislekahuna.github.io/test/images/assets/eraser.png',
+                src='https://raw.githubusercontent.com/vanislekahuna/vanislekahuna.github.io/master/images/assets/eraser.png',
                 style={
                     'height': '34px',
                     'width': '34px',
@@ -583,7 +583,7 @@ app.layout = html.Div([
                     columns=[
                         {'name': 'Site Name', 'id': 'site_name'},
                         {'name': 'City', 'id': 'city'},
-                        {'name': 'Contact Phone', 'id': 'phone'},
+                        {'name': 'Full Address', 'id': 'full_address'}, # Removed the 'Contact Phone' column for address
                         {'name': 'Max Capacity', 'id': 'max_capacity'},
                         {'name': 'Event Type', 'id': 'event_type'},
                     ],
@@ -692,7 +692,7 @@ def refresh_emergency_data(n_clicks):
 # Slicers affecting one another callback
 @app.callback(
     [Output('event-type-filter', 'options'),
-     Output('event-name-filter', 'options')],
+     Output('facility-type-filter', 'options')],
     [Input('city-filter', 'value'),
      Input('sites-data-store', 'children'),
      Input('emergency-data-store', 'children')]
@@ -720,12 +720,17 @@ def update_filter_options(selected_city, sites_json, poly_json):
     # Event types
     if len(affected_sites) > 0:
         event_types = [{'label': 'All Types', 'value': 'all'}] + [{'label': et, 'value': et} for et in sorted(affected_sites['event_type'].unique())]
-        event_names = [{'label': 'All Events', 'value': 'all'}] + [{'label': en, 'value': en} for en in sorted(affected_sites['event_name'].unique())]
+        # event_names = [{'label': 'All Events', 'value': 'all'}] + [{'label': en, 'value': en} for en in sorted(affected_sites['event_name'].unique())]
     else:
         event_types = [{'label': 'All Types', 'value': 'all'}]
-        event_names = [{'label': 'All Events', 'value': 'all'}]
+        # event_names = [{'label': 'All Events', 'value': 'all'}]
 
-    return event_types, event_names
+    if len(filtered_sites) > 0:
+        facility_types = [{'label': 'All Facility Types', 'value': 'all'}] + [{'label': pt, 'value': pt} for pt in sorted(filtered_sites['property_type'].dropna().unique())]
+    else:
+        facility_types = [{'label': 'All Facility Types', 'value': 'all'}]
+
+    return event_types, facility_types
 
 
 # Filter affecting map and table callback
@@ -734,15 +739,15 @@ def update_filter_options(selected_city, sites_json, poly_json):
      Output('sites-table', 'data')],
     [Input('city-filter', 'value'),
      Input('event-type-filter', 'value'),
-     Input('event-name-filter', 'value'),
+     Input('facility-type-filter', 'value'),
      Input('affected-toggle', 'value'),
      Input('sites-data-store', 'children'),
      Input('emergency-data-store', 'children'),
-     Input('user-location-store', 'children'),  # NEW
-     Input('selected-radius-store', 'children')]  # NEW
+     Input('user-location-store', 'children'),
+     Input('selected-radius-store', 'children')]
 )
 
-def update_map_and_table(city_filter, event_type_filter, event_name_filter,
+def update_map_and_table(city_filter, event_type_filter, facility_type_filter,
                         affected_toggle, sites_json, poly_json, user_location_json, selected_radius):
     """Update map and table based on filters"""
 
@@ -789,9 +794,9 @@ def update_map_and_table(city_filter, event_type_filter, event_name_filter,
     if event_type_filter != 'all':
         filtered_sites = filtered_sites[filtered_sites['event_type'] == event_type_filter]
 
-    # Event name filter
-    if event_name_filter != 'all':
-        filtered_sites = filtered_sites[filtered_sites['event_name'] == event_name_filter]
+    # Facility type filter
+    if facility_type_filter != 'all':
+        filtered_sites = filtered_sites[filtered_sites['property_type'] == facility_type_filter]
 
     # Affected toggle
     if 'affected' in affected_toggle:
@@ -920,6 +925,7 @@ def update_map_and_table(city_filter, event_type_filter, event_name_filter,
                 hovertext=[
                     f"<b>{row['site_name']}</b><br>"
                     f"City: {row['city']}<br>"
+                    f"Facility Type: {row['property_type']}<br>"
                     f"Capacity: {row['max_capacity']}<br>"
                     f"<b>⚠️ Affected by: {row['event_type']}</b>"
                     for _, row in affected_sites.iterrows()
@@ -951,6 +957,7 @@ def update_map_and_table(city_filter, event_type_filter, event_name_filter,
                 hovertext=[
                     f"<b>{row['site_name']}</b><br>"
                     f"City: {row['city']}<br>"
+                    f"Facility Type: {row['property_type']}<br>"
                     f"Capacity: {row['max_capacity']}<br>"
                     f"Status: Not affected"
                     for _, row in unaffected_sites.iterrows()
@@ -963,7 +970,7 @@ def update_map_and_table(city_filter, event_type_filter, event_name_filter,
     # Calculate map center and zoom based on filtered sites
     is_default_view = (city_filter == 'all' and 
                    event_type_filter == 'all' and 
-                   event_name_filter == 'all' and 
+                   facility_type_filter == 'all' and 
                    'affected' not in affected_toggle)
 
     # Priority 1: User searched an address - zoom to that location
@@ -1055,7 +1062,7 @@ def update_map_and_table(city_filter, event_type_filter, event_name_filter,
     fig.update_mapboxes(bearing=0, pitch=0)
 
     # Prepare table data
-    table_data = filtered_sites[['site_name', 'city', 'max_capacity', 'event_type']].fillna('').to_dict('records') # Removed 'phone', 
+    table_data = filtered_sites[['site_name', 'city', 'full_address', 'max_capacity', 'event_type']].fillna('').to_dict('records') # Removed 'phone', 
 
     return fig, table_data
 
@@ -1064,9 +1071,9 @@ def update_map_and_table(city_filter, event_type_filter, event_name_filter,
 @app.callback(
     [Output('city-filter', 'value'),
      Output('event-type-filter', 'value'),
-     Output('event-name-filter', 'value'),
+     Output('facility-type-filter', 'value'),
      Output('affected-toggle', 'value'),
-     Output('address-search', 'value')],  # NEW - clear search box
+     Output('address-search', 'value')],
     Input('reset-button', 'n_clicks'),
     prevent_initial_call=True
 )
@@ -1081,16 +1088,16 @@ def reset_filters(n_clicks):
      Output('total-spaces-number', 'children')],
     [Input('city-filter', 'value'),
      Input('event-type-filter', 'value'),
-     Input('event-name-filter', 'value'),
+     Input('facility-type-filter', 'value'),
      Input('affected-toggle', 'value'),
      Input('sites-data-store', 'children'),
      Input('emergency-data-store', 'children'),
      Input('user-location-store', 'children'),  # NEW
      Input('selected-radius-store', 'children')]  # NEW
 )
-def update_metric_cards(city_filter, event_type_filter, event_name_filter,
+def update_metric_cards(city_filter, event_type_filter, facility_type_filter,
                        affected_toggle, sites_json, poly_json,
-                       user_location_json, selected_radius): # ADDED PARAMETERS
+                       user_location_json, selected_radius): 
     """Update the metric cards based on filters"""
     
     # Load data (same logic as update_map_and_table)
@@ -1133,10 +1140,10 @@ def update_metric_cards(city_filter, event_type_filter, event_name_filter,
     # Event type filter
     if event_type_filter != 'all':
         filtered_sites = filtered_sites[filtered_sites['event_type'] == event_type_filter]
-    
-    # Event name filter
-    if event_name_filter != 'all':
-        filtered_sites = filtered_sites[filtered_sites['event_name'] == event_name_filter]
+
+    # Facility type filter
+    if facility_type_filter != 'all':
+        filtered_sites = filtered_sites[filtered_sites['property_type'] == facility_type_filter]
     
     # Affected toggle
     if 'affected' in affected_toggle:
