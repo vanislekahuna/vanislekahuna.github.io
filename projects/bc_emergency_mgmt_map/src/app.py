@@ -1079,7 +1079,7 @@ def update_map_and_table(city_filter, event_type_filter, facility_type_filter,
 )
 def reset_filters(n_clicks):
     """Reset all filters to default values"""
-    return 'all', 'all', 'all', 'all', [], ''
+    return 'all', 'all', 'all', [], ''
 
 
 # Update metric cards callback
