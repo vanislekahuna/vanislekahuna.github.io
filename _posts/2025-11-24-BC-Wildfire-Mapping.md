@@ -13,14 +13,7 @@ This notebook provides a step-by-step guide on wildfire mapping techniques using
 
 <!-- more -->
 
-<iframe 
-  src="https://nbviewer.org/github/vanislekahuna/wps-labs/blob/main/Intro_Wildfire_Mapping_Lab/BC_Wildfire_Mapping.ipynb" 
-  width="100%" 
-  height="1200px" 
-  frameborder="0"
-    style="border: 1px solid var(--border-color); border-radius: 4px;">
-  <!-- style="border: 1px solid #ccc; border-radius: 4px;"> -->
-</iframe>
+[**View Full Lab Tutorial**](https://vanislekahuna.github.io/wps-labs/Intro_Wildfire_Mapping_Lab/BC_Wildfire_Mapping.html)
 
 ---
 

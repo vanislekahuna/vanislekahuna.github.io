@@ -26,15 +26,7 @@ and that's precisely the point.
 
 <!-- more -->
 
-
-<iframe 
-  src="https://nbviewer.org/github/vanislekahuna/vanislekahuna.github.io/blob/master/notebooks/%5BPart_1%5DRethinking_Predictors_Why_Causal_Reasoning_Matters_in_Data_Science.ipynb" 
-  width="100%" 
-  height="1200px" 
-  frameborder="0"
-    style="border: 1px solid var(--border-color); border-radius: 4px;">
-  <!-- style="border: 1px solid #ccc; border-radius: 4px;"> -->
-</iframe>
+[**View Full Lab Tutorial**](https://vanislekahuna.github.io/wps-labs/Bayesian_Wildfire_Stats_Lab/%5BPart_1%5DRethinking_Predictors_Why_Causal_Reasoning_Matters_in_Data_Science.html)
 
 ---
 

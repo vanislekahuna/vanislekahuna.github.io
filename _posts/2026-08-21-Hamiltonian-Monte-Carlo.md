@@ -20,15 +20,7 @@ Every time a Bayesian model gets fit in PyMC, the Hamiltonian Monte Carlo algori
 
 <!-- more -->
 
-
-<iframe 
-  src="https://nbviewer.org/github/vanislekahuna/wps-labs/blob/main/Bayesian_Wildfire_Stats_Lab/Reverse_Engineering_Hamiltonian_Monte_Carlo.ipynb" 
-  width="100%" 
-  height="1200px" 
-  frameborder="0"
-    style="border: 1px solid var(--border-color); border-radius: 4px;">
-  <!-- style="border: 1px solid #ccc; border-radius: 4px;"> -->
-</iframe>
+[**View Full Lab Tutorial**](https://vanislekahuna.github.io/wps-labs/Bayesian_Wildfire_Stats_Lab/Reverse_Engineering_Hamiltonian_Monte_Carlo.html)
 
 ---
 

@@ -25,15 +25,7 @@ survive contact with the data, and our revised DAG is far better for it.
 
 <!-- more -->
 
-
-<iframe 
-  src="https://nbviewer.org/github/vanislekahuna/vanislekahuna.github.io/blob/master/notebooks/%5BPart_2%5DPutting_DAGs_to_the_Test_What_Regression_reveals_about_Wildfire_Drivers.ipynb" 
-  width="100%" 
-  height="1200px" 
-  frameborder="0"
-    style="border: 1px solid var(--border-color); border-radius: 4px;">
-  <!-- style="border: 1px solid #ccc; border-radius: 4px;"> -->
-</iframe>
+[**View Full Lab Tutorial**](https://vanislekahuna.github.io/wps-labs/Bayesian_Wildfire_Stats_Lab/%5BPart_2%5DPutting_DAGs_to_the_Test_What_Regression_reveals_about_Wildfire_Drivers.html)
 
 ---
 
